@@ -1,36 +1,4 @@
-import {testFragmentShader, testVertexShader} from "./shaders";
-
-function compileShader(gl: WebGLRenderingContext, src: string, type: number) {
-    const shader = gl.createShader(type) as WebGLShader;
-    gl.shaderSource(shader, src);
-    gl.compileShader(shader);
-
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        console.error("An error occurred compiling the shaders: " + gl.getShaderInfoLog(shader));
-    }
-
-    return shader;
-}
-
-//https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Basic_2D_animation_example
-function buildShaderProgram(gl: WebGLRenderingContext, shaderInfo) {
-    const program = gl.createProgram() as WebGLProgram;
-
-    shaderInfo.forEach(desc => {
-        const shader = compileShader(gl, desc.src, desc.type);
-        if(shader) {
-            gl.attachShader(program, shader);
-        }
-    });
-
-    gl.linkProgram(program);
-
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-        console.error("Unable to initialize the shader program: " + gl.getProgramInfoLog(program));
-    }
-
-    return program;
-}
+import {testFragmentShader, testVertexShader, buildShaderProgram} from "./shaders";
 
 function ndcToScreen(gl: WebGLRenderingContext, x: number, y: number) {
     return {
@@ -40,6 +8,14 @@ function ndcToScreen(gl: WebGLRenderingContext, x: number, y: number) {
 }
 
 function draw() {
+    const inCanvas = document.getElementById("incanvas") as HTMLCanvasElement;
+    const inCtx = inCanvas.getContext("2d") as CanvasRenderingContext2D;
+    inCtx.fillStyle = "blue";
+    inCtx.fillRect(0, 0, inCanvas.width, inCanvas.height);
+    inCtx.fillStyle = "red";
+    inCtx.font = "200px Arial";
+    inCtx.fillText("Hello World", 500 + 50 * Math.random(), 500 + 50 * Math.random());
+
     const canvas = document.getElementById("glcanvas") as HTMLCanvasElement;
     const gl = canvas.getContext("webgl") as WebGLRenderingContext;
 
@@ -55,17 +31,9 @@ function draw() {
 
     const shaderProgram = buildShaderProgram(gl, shaderSet);
 
-    const aspectRatio = canvas.width / canvas.height;
-
     const vertexArray = new Float32Array([
       -1, 1, 1, 1, 1, -1, -1, 1, 1, -1, -1, -1,
     ]);
-    const screenPosArray = new Float32Array(vertexArray.length);
-    for(let i = 0; i < vertexArray.length; i += 2) {
-        const screenPos = ndcToScreen(gl, vertexArray[i], vertexArray[i + 1]);
-        screenPosArray[i] = screenPos.x;
-        screenPosArray[i + 1] = screenPos.y;
-    }
 
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(0, 0, 0, 1.0);
@@ -73,8 +41,29 @@ function draw() {
 
     gl.useProgram(shaderProgram);
 
-    const uGlobalColor = gl.getUniformLocation(shaderProgram, "uGlobalColor");
-    gl.uniform4fv(uGlobalColor, [0, 1.0, 0, 1.0]);
+    const uInputResolution = gl.getUniformLocation(shaderProgram, "uInputResolution");
+    gl.uniform2fv(uInputResolution, [inCanvas.width, inCanvas.height]);
+
+    const uInputTexture = gl.getUniformLocation(shaderProgram, "uInputTexture");
+    const texture = gl.createTexture();
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, inCanvas);
+    // gl.texImage2D(
+    //     gl.TEXTURE_2D,
+    //     0,
+    //     gl.RGBA,
+    //     1,
+    //     1,
+    //     0,
+    //     gl.RGBA,
+    //     gl.UNSIGNED_BYTE,
+    //     new Uint8Array([255, 0, 0, 255])
+    // )
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+    gl.generateMipmap(gl.TEXTURE_2D);
+    gl.uniform1i(uInputTexture, 0);
 
     const aVertexPosition = gl.getAttribLocation(shaderProgram, "aVertexPosition");
     const vertexBuffer = gl.createBuffer();
@@ -90,21 +79,9 @@ function draw() {
         0
     );
 
-    const aScreenPosition = gl.getAttribLocation(shaderProgram, "aScreenPosition");
-    const screenPosBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, screenPosBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, screenPosArray, gl.STATIC_DRAW);
-    gl.enableVertexAttribArray(aScreenPosition);
-    gl.vertexAttribPointer(
-        aScreenPosition,
-        2,
-        gl.FLOAT,
-        false,
-        0,
-        0
-    );
-
     gl.drawArrays(gl.TRIANGLES, 0, vertexArray.length / 2);
+
+    requestAnimationFrame(draw);
 }
 
 window.onload = draw;
