@@ -32,51 +32,14 @@ function buildShaderProgram(gl: WebGLRenderingContext, shaderInfo) {
     return program;
 }
 
-let currentAngle, previousTime = 0, currentScale = [1, 1], currentRotation = [0, 1], uScalingFactor, uGlobalColor, uRotationVector, aVertexPosition, vertexNumComponents, vertexCount, vertexBuffer, shaderProgram;
-function animateScene(gl: WebGLRenderingContext) {
-
-    const radians = (currentAngle * Math.PI) / 180.0;
-    currentRotation[0] = Math.sin(radians);
-    currentRotation[1] = Math.cos(radians);
-
-    gl.useProgram(shaderProgram);
-
-    uScalingFactor = gl.getUniformLocation(shaderProgram, "uScalingFactor");
-    uGlobalColor = gl.getUniformLocation(shaderProgram, "uGlobalColor");
-    uRotationVector = gl.getUniformLocation(shaderProgram, "uRotationVector");
-
-    gl.uniform2fv(uScalingFactor, currentScale);
-    gl.uniform2fv(uRotationVector, currentRotation);
-    gl.uniform4fv(uGlobalColor, [0.1, 0.7, 0.2, 1.0]);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-
-    aVertexPosition = gl.getAttribLocation(shaderProgram, "aVertexPosition");
-
-    gl.enableVertexAttribArray(aVertexPosition);
-    gl.vertexAttribPointer(
-        aVertexPosition,
-        vertexNumComponents,
-        gl.FLOAT,
-        false,
-        0,
-        0
-    );
-
-    gl.drawArrays(gl.TRIANGLES, 0, vertexCount);
-
-    requestAnimationFrame((currentTime) => {
-        const deltaAngle =
-            ((currentTime - previousTime) / 1000.0) * 90;
-
-        currentAngle = (currentAngle + deltaAngle) % 360;
-
-        previousTime = currentTime;
-        animateScene(gl);
-    });
+function ndcToScreen(gl: WebGLRenderingContext, x: number, y: number) {
+    return {
+        x: (x + 1) * gl.canvas.width / 2,
+        y: (y + 1) * gl.canvas.height / 2
+    };
 }
 
-function main() {
+function draw() {
     const canvas = document.getElementById("glcanvas") as HTMLCanvasElement;
     const gl = canvas.getContext("webgl") as WebGLRenderingContext;
 
@@ -90,30 +53,58 @@ function main() {
         {type: gl.FRAGMENT_SHADER, src: testFragmentShader}
     ];
 
-    shaderProgram = buildShaderProgram(gl, shaderSet);
+    const shaderProgram = buildShaderProgram(gl, shaderSet);
 
     const aspectRatio = canvas.width / canvas.height;
-    currentRotation = [0, 1];
-    currentScale = [1.0, aspectRatio];
 
     const vertexArray = new Float32Array([
-      -0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5,
+      -1, 1, 1, 1, 1, -1, -1, 1, 1, -1, -1, -1,
     ]);
-  
-    vertexBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, vertexArray, gl.STATIC_DRAW);
-
-    vertexNumComponents = 2;
-    vertexCount = vertexArray.length / vertexNumComponents;
-
-    currentAngle = 0.0;
+    const screenPosArray = new Float32Array(vertexArray.length);
+    for(let i = 0; i < vertexArray.length; i += 2) {
+        const screenPos = ndcToScreen(gl, vertexArray[i], vertexArray[i + 1]);
+        screenPosArray[i] = screenPos.x;
+        screenPosArray[i + 1] = screenPos.y;
+    }
 
     gl.viewport(0, 0, canvas.width, canvas.height);
-    gl.clearColor(0.8, 0.9, 1.0, 1.0);
+    gl.clearColor(0, 0, 0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    animateScene(gl);
+    gl.useProgram(shaderProgram);
+
+    const uGlobalColor = gl.getUniformLocation(shaderProgram, "uGlobalColor");
+    gl.uniform4fv(uGlobalColor, [0, 1.0, 0, 1.0]);
+
+    const aVertexPosition = gl.getAttribLocation(shaderProgram, "aVertexPosition");
+    const vertexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, vertexArray, gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(aVertexPosition);
+    gl.vertexAttribPointer(
+        aVertexPosition,
+        2,
+        gl.FLOAT,
+        false,
+        0,
+        0
+    );
+
+    const aScreenPosition = gl.getAttribLocation(shaderProgram, "aScreenPosition");
+    const screenPosBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, screenPosBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, screenPosArray, gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(aScreenPosition);
+    gl.vertexAttribPointer(
+        aScreenPosition,
+        2,
+        gl.FLOAT,
+        false,
+        0,
+        0
+    );
+
+    gl.drawArrays(gl.TRIANGLES, 0, vertexArray.length / 2);
 }
 
-window.onload = main;
+window.onload = draw;

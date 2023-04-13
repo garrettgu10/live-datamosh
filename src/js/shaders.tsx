@@ -1,24 +1,25 @@
 export const testVertexShader = `
+precision mediump float;
 attribute vec2 aVertexPosition;
+attribute vec2 aScreenPosition;
 
-uniform vec2 uScalingFactor;
-uniform vec2 uRotationVector;
+varying vec2 vScreenPosition;
 
 void main() {
-    vec2 rotatedPosition = vec2(
-        aVertexPosition.x * uRotationVector.x - aVertexPosition.y * uRotationVector.y,
-        aVertexPosition.x * uRotationVector.y + aVertexPosition.y * uRotationVector.x
-    );
-    gl_Position = vec4(rotatedPosition * uScalingFactor, 0, 1);
+    gl_Position = vec4(aVertexPosition, 0, 1);
+
+    vScreenPosition = aScreenPosition;
 }`;
 
 export const testFragmentShader = `
-#ifdef GL_ES
 precision mediump float;
-#endif
 uniform vec4 uGlobalColor;
 
+varying vec2 vScreenPosition;
+
 void main() {
-    gl_FragColor = uGlobalColor;
+    int x = int(vScreenPosition.x);
+    int y = int(vScreenPosition.y);
+    gl_FragColor = vec4(mod(float(x+y), 2.0), 0, 0, 1.0);
 }
 `;
