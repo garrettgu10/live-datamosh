@@ -1,4 +1,4 @@
-import {testFragmentShader, testVertexShader, buildShaderProgram} from "./shaders";
+import {motionEstimateVertexShader, motionEstimateFragmentShader, buildShaderProgram} from "./shaders";
 
 const BLOCK_SIZE = 16;
 
@@ -10,7 +10,6 @@ export class MotionEstimator{
     private currentFrameTextureIdx: number;
     public constructor(
         public inCanvas: HTMLCanvasElement,
-        public inCtx: CanvasRenderingContext2D,
         public canvas: HTMLCanvasElement,
         public gl: WebGLRenderingContext
     ) {
@@ -20,8 +19,8 @@ export class MotionEstimator{
         }
     
         const shaderSet = [
-            {type: gl.VERTEX_SHADER, src: testVertexShader},
-            {type: gl.FRAGMENT_SHADER, src: testFragmentShader(BLOCK_SIZE)}
+            {type: gl.VERTEX_SHADER, src: motionEstimateVertexShader},
+            {type: gl.FRAGMENT_SHADER, src: motionEstimateFragmentShader(BLOCK_SIZE)}
         ];
 
         canvas.width = inCanvas.width / BLOCK_SIZE;
@@ -61,13 +60,8 @@ export class MotionEstimator{
         gl.uniform1i(uPrevFrame, 1 - this.currentFrameTextureIdx);
     }
 
-    public draw() {
-        const {gl, inCanvas, inCtx} = this;
-        inCtx.fillStyle = "blue";
-        inCtx.fillRect(0, 0, inCanvas.width, inCanvas.height);
-        inCtx.fillStyle = "red";
-        inCtx.font = "200px Arial";
-        inCtx.fillText("Hello World", 500 + 50 * Math.random(), 500 + 50 * Math.random());
+    public draw = () => {
+        const {gl, inCanvas} = this;
 
         const uInputResolution = gl.getUniformLocation(this.shaderProgram, "uInputResolution");
         gl.uniform2fv(uInputResolution, [inCanvas.width, inCanvas.height]);
@@ -76,6 +70,7 @@ export class MotionEstimator{
 
         this.nextFrame();
         gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -95,8 +90,6 @@ export class MotionEstimator{
         );
     
         gl.drawArrays(gl.TRIANGLES, 0, this.vertexArray.length / 2);
-
-        requestAnimationFrame(this.draw.bind(this));
     }
 
 }

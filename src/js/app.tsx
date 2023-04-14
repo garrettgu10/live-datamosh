@@ -1,4 +1,16 @@
+import { HelloWorld } from "./hello-world";
 import { MotionEstimator } from "./motion-estimator";
+
+let estimator: MotionEstimator;
+let helloWorld: HelloWorld;
+function draw() {
+    helloWorld.draw();
+    estimator.draw();
+
+    setTimeout(() => {
+        requestAnimationFrame(draw);
+    }, 1000 / 30);
+}
 
 function main() {
     const inCanvas = document.getElementById("incanvas") as HTMLCanvasElement;
@@ -6,8 +18,9 @@ function main() {
     const canvas = document.getElementById("glcanvas") as HTMLCanvasElement;
     const gl = canvas.getContext("webgl") as WebGLRenderingContext;
 
-    const estimator = new MotionEstimator(inCanvas, inCtx, canvas, gl);
-    estimator.draw();
+    estimator = new MotionEstimator(inCanvas, canvas, gl);
+    helloWorld = new HelloWorld(inCanvas);
+    draw();
 }
 
 window.onload = main;
