@@ -62,39 +62,11 @@ class MotionEstimator{
         gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, inCanvas);
-        // console.log(inCtx.getImageData(0, 0, 1, 1));
-        // const sz = [1022, 4]
-        // gl.texImage2D(
-        //     gl.TEXTURE_2D,
-        //     0,
-        //     gl.RGBA,
-        //     sz[0],
-        //     sz[1],
-        //     0,
-        //     gl.RGBA,
-        //     gl.UNSIGNED_BYTE,
-        //     new Uint8Array(sz[0] * sz[1] * 4)
-        // );
-        // console.log(inCtx.getImageData(0, 0, inCanvas.width, inCanvas.height).data);
-        // gl.texImage2D(
-        //     gl.TEXTURE_2D,
-        //     0,
-        //     gl.RGBA,
-        //     inCanvas.width,
-        //     inCanvas.height,
-        //     0,
-        //     gl.RGBA,
-        //     gl.UNSIGNED_BYTE,
-        //     new Uint8Array(inCanvas.width * inCanvas.height * 4)
-        // )
-        // gl.generateMipmap(gl.TEXTURE_2D);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
-        // console.log(gl.getError());
-        // console.log(gl.getParameter(gl.MAX_TEXTURE_SIZE));
+        gl.uniform1i(uInputTexture, 0);
 
         const aVertexPosition = gl.getAttribLocation(this.shaderProgram, "aVertexPosition");
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
