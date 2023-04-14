@@ -1,5 +1,6 @@
+import {Target} from "./target";
 
-export class VideoPlayer {
+export class VideoPlayer implements Target {
     constructor(public canvas: HTMLCanvasElement, public video: HTMLVideoElement) {
 
     }

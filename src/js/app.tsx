@@ -1,15 +1,18 @@
-import { HelloWorld } from "./hello-world";
+import { HelloWorld } from "./targets/hello-world";
 import { MotionEstimator } from "./motion-estimator";
 import { MotionReconstructor } from "./motion-reconstructor";
-import { VideoPlayer } from "./video-player";
+import { VideoPlayer } from "./targets/video-player";
 
 import { FRAME_RATE, MSE_SCALE, MSE_THRESH } from "./consts";
+import { CameraFeed } from "./targets/camera-feed";
+import {Target} from "./targets/target";
 
 let estimator: MotionEstimator;
-let target;
+let targets: Target[] = [];
+let currTarget = 0;
 let reconstructor: MotionReconstructor;
 function draw() {
-    target.draw();
+    targets[currTarget].draw();
     estimator.draw();
     reconstructor.draw();
 
@@ -60,15 +63,21 @@ function main() {
     const outCanvas = document.getElementById("outcanvas") as HTMLCanvasElement;
 
     estimator = new MotionEstimator(inCanvas, canvas, outCanvas);
-    target = new VideoPlayer(inCanvas, document.getElementById("video") as HTMLVideoElement);
-    // target = new HelloWorld(inCanvas);
+    targets.push(new VideoPlayer(inCanvas, document.getElementById("video") as HTMLVideoElement));
+    targets.push(new HelloWorld(inCanvas));
+    targets.push(new CameraFeed(inCanvas, document.getElementById("webcam-video") as HTMLVideoElement));
     reconstructor = new MotionReconstructor(inCanvas, canvas, outCanvas);
     draw();
 }
 
 window.onload = main;
 
-document.getElementById('btn')?.addEventListener('click', () => {
-    const video = document.getElementById("video") as HTMLVideoElement;
-    video.play();
+document.getElementById('video-btn')?.addEventListener('click', () => {
+    (document.getElementById("video") as HTMLVideoElement).play();
+    (document.getElementById("webcam-video") as HTMLVideoElement).play();
+
+});
+
+document.getElementById('target-btn')?.addEventListener('click', () => {
+    currTarget = (currTarget + 1) % targets.length;
 });

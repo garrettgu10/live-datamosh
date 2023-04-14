@@ -1,5 +1,6 @@
+import {Target} from "./target";
 
-export class HelloWorld {
+export class HelloWorld implements Target {
     private x: number = 0;
     private y: number = 0;
     private vx: number = 1;

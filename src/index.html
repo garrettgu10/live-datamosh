@@ -20,10 +20,11 @@
     <body>
         <h1>My First Web Page</h1>
         <p>My first paragraph.</p>
-        <button id="btn">Play video</button><br>
-        <video id="video" width="640" height="480" style="display: none">
+        <button id="target-btn">Switch target</button><button id="video-btn">Play video</button><br>
+        <video id="video" muted width="640" height="480" style="display: none">
             <source src="bun33s.mp4" type="video/mp4">
         </video>
+        <video id="webcam-video" muted width="640" height="480" style="display: none"></video>
         <canvas id="incanvas" width="1280" height="720" style="width: 640px"></canvas>
         <canvas id="glcanvas" style="width: 640px; image-rendering: pixelated;"></canvas>
         <canvas id="outcanvas" style="width: 640px"></canvas>
