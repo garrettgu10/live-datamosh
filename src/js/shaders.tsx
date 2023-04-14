@@ -133,7 +133,7 @@ void main() {
 
     gl_FragColor = texture2D(uPrevFrame, sample_uv);
 
-    if (me.b / ${MSE_SCALE}.0 > ${mseThresh} || uUseGroundTruth) {
+    if (me.b > float(${mseThresh * MSE_SCALE}) || uUseGroundTruth) {
         gl_FragColor = texture2D(uGroundTruth, uv);
         // gl_FragColor.b = 1.0;
     }

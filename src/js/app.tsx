@@ -39,7 +39,7 @@ function dbg() {
         let b = imgData[i * 4 + 2];
         let a = imgData[i * 4 + 3];
 
-        let bailedOut = b / 255.0 / MSE_SCALE > MSE_THRESH;
+        let bailedOut = b / 255.0 > MSE_THRESH * MSE_SCALE;
         bailedOut ||= reconstructor.isIframe();
 
         imgData[i * 4] = bailedOut ? 255: 0;
