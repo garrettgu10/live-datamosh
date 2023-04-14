@@ -21,6 +21,12 @@ export class HelloWorld {
         ctx.fillStyle = "green";
         ctx.fillRect(this.x, this.y, 305, 305);
 
+        //draw a circle in the square
+        ctx.fillStyle = "yellow";
+        ctx.beginPath();
+        ctx.arc(this.x + 150, this.y + 150, 100, 0, 2 * Math.PI);
+        ctx.fill();
+
         this.x += this.vx;
         this.y += this.vy;
 

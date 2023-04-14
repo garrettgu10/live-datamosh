@@ -3,6 +3,8 @@ import { MotionEstimator } from "./motion-estimator";
 import { MotionReconstructor } from "./motion-reconstructor";
 import { VideoPlayer } from "./video-player";
 
+import { FRAME_RATE } from "./consts";
+
 let estimator: MotionEstimator;
 let target;
 let reconstructor: MotionReconstructor;
@@ -12,6 +14,10 @@ function draw() {
     reconstructor.draw();
 
     dbg();
+
+    setTimeout(() => {
+        requestAnimationFrame(draw);
+    },  1000 / 30);
 }
 
 function dbg() {
@@ -38,12 +44,10 @@ function main() {
     const outCanvas = document.getElementById("outcanvas") as HTMLCanvasElement;
 
     estimator = new MotionEstimator(inCanvas, canvas);
-    // target = new VideoPlayer(inCanvas, document.getElementById("video") as HTMLVideoElement);
-    target = new HelloWorld(inCanvas);
+    target = new VideoPlayer(inCanvas, document.getElementById("video") as HTMLVideoElement);
+    // target = new HelloWorld(inCanvas);
     reconstructor = new MotionReconstructor(inCanvas, canvas, outCanvas);
     draw();
 }
 
 window.onload = main;
-
-document.getElementById("btn")?.addEventListener("click", draw);
