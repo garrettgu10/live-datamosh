@@ -6,7 +6,7 @@
             .stacked {
                 position: relative;
                 width: 640px;
-                height: 480px;
+                height: 360px;
             }
             .stacked canvas {
                 opacity: 50%;
@@ -15,23 +15,30 @@
                 left: 0;
                 image-rendering: pixelated;
             }
+            .canvas-container {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
         </style>
     </head>
     <body>
         <h1>My First Web Page</h1>
         <p>My first paragraph.</p>
-        <button id="target-btn">Switch target</button><button id="video-btn">Play video</button><br>
+        <button id="target-btn">My first button</button><br><br>
         <video id="video" muted width="640" height="480" style="display: none">
             <source src="bun33s.mp4" type="video/mp4">
         </video>
         <video id="webcam-video" muted width="640" height="480" style="display: none"></video>
-        <canvas id="incanvas" width="1280" height="720" style="width: 640px"></canvas>
-        <canvas id="glcanvas" style="width: 640px; image-rendering: pixelated;"></canvas>
-        <canvas id="outcanvas" style="width: 640px"></canvas>
+        <div class="canvas-container">
+            <canvas id="incanvas" width="1280" height="720" style="width: 640px"></canvas>
+            <canvas id="glcanvas" style="width: 640px; image-rendering: pixelated;"></canvas>
+            <canvas id="outcanvas" style="width: 640px"></canvas>
 
-        <div class="stacked">
-            <canvas id="dbgcanvas1" style="width: 640px"></canvas>
-            <canvas id="dbgcanvas2" style="width: 640px"></canvas>
+            <div class="stacked">
+                <canvas id="dbgcanvas1" style="width: 640px"></canvas>
+                <canvas id="dbgcanvas2" style="width: 640px"></canvas>
+            </div>
         </div>
         <script type="module" src="js/app.tsx"></script>
     </body>

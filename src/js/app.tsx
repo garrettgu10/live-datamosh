@@ -63,8 +63,8 @@ function main() {
     const outCanvas = document.getElementById("outcanvas") as HTMLCanvasElement;
 
     estimator = new MotionEstimator(inCanvas, canvas, outCanvas);
-    targets.push(new VideoPlayer(inCanvas, document.getElementById("video") as HTMLVideoElement));
     targets.push(new HelloWorld(inCanvas));
+    targets.push(new VideoPlayer(inCanvas, document.getElementById("video") as HTMLVideoElement));
     targets.push(new CameraFeed(inCanvas, document.getElementById("webcam-video") as HTMLVideoElement));
     reconstructor = new MotionReconstructor(inCanvas, canvas, outCanvas);
     draw();
@@ -72,12 +72,8 @@ function main() {
 
 window.onload = main;
 
-document.getElementById('video-btn')?.addEventListener('click', () => {
-    (document.getElementById("video") as HTMLVideoElement).play();
-    (document.getElementById("webcam-video") as HTMLVideoElement).play();
-
-});
-
 document.getElementById('target-btn')?.addEventListener('click', () => {
     currTarget = (currTarget + 1) % targets.length;
+    (document.getElementById("video") as HTMLVideoElement).play();
+    (document.getElementById("webcam-video") as HTMLVideoElement).play();
 });
