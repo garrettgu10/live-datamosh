@@ -8,7 +8,7 @@ void main() {
 
 }`;
 
-export const testFragmentShader = `
+export const testFragmentShader = (blockSize: number) => `
 precision mediump float;
 
 uniform vec2 uOutputResolution;
@@ -17,17 +17,65 @@ uniform sampler2D uCurrFrame;
 uniform sampler2D uPrevFrame;
 
 vec2 pixel2uv(vec2 pixel) {
-    return vec2(pixel.x / uOutputResolution.x, 1.0 - pixel.y / uOutputResolution.y);
+    return vec2(pixel.x / uInputResolution.x, 1.0 - pixel.y / uInputResolution.y);
+}
+
+float mse(vec2 xy) {
+    float mse = 0.0;
+
+    for(int i = 0; i < ${blockSize}; i++) {
+        for(int j = 0; j < ${blockSize}; j++) {
+            vec2 uv = pixel2uv(xy + vec2(float(i), float(j)));
+            vec4 curr = texture2D(uCurrFrame, uv);
+            vec4 prev = texture2D(uPrevFrame, uv);
+            mse += pow(curr.r - prev.r, 2.0) + pow(curr.g - prev.g, 2.0) + pow(curr.b - prev.b, 2.0);
+        }
+    }
+
+    return mse / float(${blockSize * blockSize});
+}
+
+vec2 search(vec2 xy, int S) {
+    vec2 best = xy;
+    float bestMse = mse(xy);
+    for(int i = -1; i <= 1; i++) {
+        for(int j = -1; j <= 1; j++) {
+            if (i == 0 && j == 0) {
+                continue;
+            }
+            vec2 search = xy + vec2(float(i) * float(S), float(j) * float(S));
+            float mse = mse(search);
+            if (mse < bestMse) {
+                best = search;
+                bestMse = mse;
+            }
+        }
+    }
+
+    return best;
+}
+
+// three step search algorithm
+vec2 tss(vec2 xy) {
+    vec2 best = xy;
+
+    int S = 4;
+    for(int i = 0; i < 3; i++) {
+        best = search(best, S);
+        S /= 2;
+    }
+
+    return best;
 }
 
 void main() {
-    float x = gl_FragCoord.x;
-    float y = gl_FragCoord.y;
-    vec2 texel = pixel2uv(vec2(x, y));
-    gl_FragColor = texture2D(uCurrFrame, texel * vec2(2.0, 2.0));
-    if(x > uOutputResolution.x / 2.0) {
-        gl_FragColor = texture2D(uPrevFrame, texel * vec2(2.0, 2.0) - vec2(1.0, 1.0));
-    }
+    float x = gl_FragCoord.x / uOutputResolution.x * uInputResolution.x;
+    float y = gl_FragCoord.y / uOutputResolution.y * uInputResolution.y;
+
+    vec2 tss = tss(vec2(x, y));
+    vec2 delta = tss - vec2(x, y);
+    
+    gl_FragColor = vec4(0.5 + delta.x / 7.0, 0.5 + delta.y / 7.0, 0, 1);
 }
 `;
 
