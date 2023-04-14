@@ -48,6 +48,10 @@ export class MotionReconstructor {
         }
     }
 
+    public isIframe() {
+        return this.framesDrawn % IFRAME_INTERVAL === 0;
+    }
+
     private assignTexture(name: string, canvas: HTMLCanvasElement, idx: number) {
         const { gl } = this;
         const textures = [gl.TEXTURE0, gl.TEXTURE1, gl.TEXTURE2];

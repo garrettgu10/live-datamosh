@@ -3,7 +3,7 @@ import { MotionEstimator } from "./motion-estimator";
 import { MotionReconstructor } from "./motion-reconstructor";
 import { VideoPlayer } from "./video-player";
 
-import { FRAME_RATE } from "./consts";
+import { FRAME_RATE, MSE_SCALE, MSE_THRESH } from "./consts";
 
 let estimator: MotionEstimator;
 let target;
@@ -29,6 +29,22 @@ function dbg() {
     dbgCanvas1.height = canvas.height;
     const dbgCtx1 = dbgCanvas1.getContext("2d") as CanvasRenderingContext2D;
     dbgCtx1.drawImage(canvas, 0, 0);
+    const imgData = dbgCtx1.getImageData(0, 0, canvas.width, canvas.height).data;
+    for(let i = 0; i < imgData.length / 4; i++) {
+        let r = imgData[i * 4];
+        let g = imgData[i * 4 + 1];
+        let b = imgData[i * 4 + 2];
+        let a = imgData[i * 4 + 3];
+
+        let bailedOut = b / 255.0 / MSE_SCALE > MSE_THRESH;
+        bailedOut ||= reconstructor.isIframe();
+
+        imgData[i * 4] = bailedOut ? 255: 0;
+        imgData[i * 4 + 1] = 0;
+        imgData[i * 4 + 2] = 0;
+        imgData[i * 4 + 3] = 255;
+    }
+    dbgCtx1.putImageData(new ImageData(imgData, canvas.width, canvas.height), 0, 0);
 
     const outCanvas = document.getElementById("outcanvas") as HTMLCanvasElement;
     dbgCanvas2.width = outCanvas.width;
