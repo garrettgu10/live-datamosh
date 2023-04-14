@@ -1,6 +1,5 @@
 import {motionEstimateVertexShader, motionEstimateFragmentShader, buildShaderProgram} from "./shaders";
-
-const BLOCK_SIZE = 16;
+import {BLOCK_SIZE} from "./consts";
 
 export class MotionEstimator{
     private shaderProgram: WebGLProgram;
@@ -8,11 +7,13 @@ export class MotionEstimator{
     private vertexBuffer: WebGLBuffer;
     private textures: WebGLTexture[];
     private currentFrameTextureIdx: number;
+    public gl: WebGLRenderingContext;
     public constructor(
         public inCanvas: HTMLCanvasElement,
-        public canvas: HTMLCanvasElement,
-        public gl: WebGLRenderingContext
+        public canvas: HTMLCanvasElement
     ) {
+        const gl = canvas.getContext("webgl") as WebGLRenderingContext;
+        this.gl = gl;
         if (gl === null) {
             alert("Unable to initialize WebGL. Your browser or machine may not support it.");
             return;
@@ -51,6 +52,10 @@ export class MotionEstimator{
         gl.activeTexture(textures[nextTextureIdx]);
         gl.bindTexture(gl.TEXTURE_2D, this.textures[nextTextureIdx]);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, inCanvas);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
         this.currentFrameTextureIdx = nextTextureIdx;
 
@@ -71,10 +76,6 @@ export class MotionEstimator{
         this.nextFrame();
         gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
         const aVertexPosition = gl.getAttribLocation(this.shaderProgram, "aVertexPosition");
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);

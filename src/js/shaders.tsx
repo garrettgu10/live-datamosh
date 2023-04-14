@@ -1,5 +1,5 @@
 export const motionEstimateVertexShader = `
-precision mediump float;
+precision highp float;
 attribute vec2 aVertexPosition;
 
 void main() {
@@ -8,7 +8,7 @@ void main() {
 }`;
 
 export const motionEstimateFragmentShader = (blockSize: number) => `
-precision mediump float;
+precision highp float;
 
 uniform vec2 uOutputResolution;
 uniform vec2 uInputResolution;
@@ -16,7 +16,7 @@ uniform sampler2D uCurrFrame;
 uniform sampler2D uPrevFrame;
 
 vec2 pixel2uv(vec2 pixel) {
-    return vec2(pixel.x / uInputResolution.x, pixel.y / uInputResolution.y);
+    return pixel / uInputResolution;
 }
 
 float mse(vec2 curr_xy, vec2 prev_xy) {
@@ -57,11 +57,12 @@ vec3 search(vec2 curr_xy, vec2 prev_xy, int S) {
 
 // three step search algorithm
 vec3 tss(vec2 xy) {
-    vec3 best = vec3(xy, 3);
+    vec3 best = vec3(xy, mse(xy, xy));
 
     int S = 4;
     for(int i = 0; i < 3; i++) {
         best = search(xy, vec2(best.x, best.y), S);
+
         S /= 2;
     }
 
@@ -75,12 +76,16 @@ void main() {
     vec3 tss = tss(vec2(x, y));
     vec2 delta = vec2(tss.x, tss.y) - vec2(x, y);
     
-    gl_FragColor = vec4(0.5 + delta.x / 7.0, 0.5 + delta.y / 7.0, tss.z / 3.0, 1.0);
+    gl_FragColor = vec4(0.5 + delta.x / 15.0, 0.5 + delta.y / 15.0, tss.z / 3.0, 1.0);
+
+    // if(tss.z == 0.0) {
+    //     gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+    // }
 }
 `;
 
 export const motionReconstructVertexShader = `
-precision mediump float;
+precision highp float;
 attribute vec2 aVertexPosition;
 
 void main() {
@@ -89,32 +94,39 @@ void main() {
 }`;
 
 export const motionReconstructFragmentShader = (blockSize: number, mseThresh: number) => `
-precision mediump float;
+precision highp float;
 
-uniform vec2 resolution;
+uniform vec2 uResolution;
+uniform bool uUseGroundTruth;
 
 uniform sampler2D uPrevFrame; // the frame we should base reconstruction on
 uniform sampler2D uMotionEstimate; // the motion estimate from the previous frame
 uniform sampler2D uGroundTruth; // the ground truth frame, sample when mseThresh is hit
 
-void main() {
-    vec2 uv = gl_FragCoord.xy / resolution.xy;
+float round(float x) {
+    return floor(x + 0.5);
+}
 
-    vec2 me_resolution = resolution / ${blockSize}.0;
-    vec2 me_uv = floor(uv * me_resolution) / me_resolution;
+void main() {
+    vec2 uv = gl_FragCoord.xy / uResolution.xy;
+
+    vec2 me_resolution = uResolution / ${blockSize}.0;
+    vec2 me_uv = floor(uv * me_resolution + vec2(0.5, 0.5)) / me_resolution;
 
     vec4 me = texture2D(uMotionEstimate, me_uv);
 
-    vec2 delta = vec2(me.r - 0.5, me.g - 0.5) * 7.0;
-    vec2 sample_xy = uv * resolution - delta;
+    vec2 delta = vec2(me.r - 0.5, me.g - 0.5) * 15.0;
+    vec2 sample_xy = gl_FragCoord.xy + vec2(round(delta.x), round(delta.y));
 
-    vec2 sample_uv = sample_xy / resolution;
+    vec2 sample_uv = sample_xy / uResolution;
 
     gl_FragColor = texture2D(uPrevFrame, sample_uv);
 
-    if (me.b < ${mseThresh}) {
+    if (me.b > ${mseThresh} || uUseGroundTruth) {
         gl_FragColor = texture2D(uGroundTruth, uv);
     }
+
+    // gl_FragColor = vec4(me.b, 0, 0, 1);
 }
 
 `;
