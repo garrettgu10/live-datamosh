@@ -11,13 +11,14 @@ void main() {
 export const testFragmentShader = `
 precision mediump float;
 
+uniform vec2 uOutputResolution;
 uniform vec2 uInputResolution;
 uniform sampler2D uInputTexture;
 
 void main() {
     float x = gl_FragCoord.x;
     float y = gl_FragCoord.y;
-    gl_FragColor = texture2D(uInputTexture, vec2(x * 1.0 / uInputResolution.x, y * 1.0 / uInputResolution.y));
+    gl_FragColor = texture2D(uInputTexture, vec2(x * 1.0 / uOutputResolution.x, y * 1.0 / uOutputResolution.y));
 }
 `;
 

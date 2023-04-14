@@ -54,27 +54,47 @@ class MotionEstimator{
 
         const uInputResolution = gl.getUniformLocation(this.shaderProgram, "uInputResolution");
         gl.uniform2fv(uInputResolution, [inCanvas.width, inCanvas.height]);
+        const uOutputResolution = gl.getUniformLocation(this.shaderProgram, "uOutputResolution");
+        gl.uniform2fv(uOutputResolution, [gl.canvas.width, gl.canvas.height]);
 
         const uInputTexture = gl.getUniformLocation(this.shaderProgram, "uInputTexture");
         gl.activeTexture(gl.TEXTURE0);
-        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+        gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, inCanvas);
+        // console.log(inCtx.getImageData(0, 0, 1, 1));
+        // const sz = [1022, 4]
         // gl.texImage2D(
         //     gl.TEXTURE_2D,
         //     0,
         //     gl.RGBA,
-        //     1,
-        //     1,
+        //     sz[0],
+        //     sz[1],
         //     0,
         //     gl.RGBA,
         //     gl.UNSIGNED_BYTE,
-        //     new Uint8Array([255, 0, 0, 255])
+        //     new Uint8Array(sz[0] * sz[1] * 4)
+        // );
+        // console.log(inCtx.getImageData(0, 0, inCanvas.width, inCanvas.height).data);
+        // gl.texImage2D(
+        //     gl.TEXTURE_2D,
+        //     0,
+        //     gl.RGBA,
+        //     inCanvas.width,
+        //     inCanvas.height,
+        //     0,
+        //     gl.RGBA,
+        //     gl.UNSIGNED_BYTE,
+        //     new Uint8Array(inCanvas.width * inCanvas.height * 4)
         // )
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
-        gl.generateMipmap(gl.TEXTURE_2D);
-        gl.uniform1i(uInputTexture, 0);
+        // gl.generateMipmap(gl.TEXTURE_2D);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+        // console.log(gl.getError());
+        // console.log(gl.getParameter(gl.MAX_TEXTURE_SIZE));
 
         const aVertexPosition = gl.getAttribLocation(this.shaderProgram, "aVertexPosition");
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
@@ -90,7 +110,7 @@ class MotionEstimator{
         );
     
         gl.drawArrays(gl.TRIANGLES, 0, this.vertexArray.length / 2);
-    
+
         requestAnimationFrame(this.draw.bind(this));
     }
 
