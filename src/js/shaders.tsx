@@ -13,12 +13,21 @@ precision mediump float;
 
 uniform vec2 uOutputResolution;
 uniform vec2 uInputResolution;
-uniform sampler2D uInputTexture;
+uniform sampler2D uCurrFrame;
+uniform sampler2D uPrevFrame;
+
+vec2 pixel2uv(vec2 pixel) {
+    return vec2(pixel.x / uOutputResolution.x, 1.0 - pixel.y / uOutputResolution.y);
+}
 
 void main() {
     float x = gl_FragCoord.x;
     float y = gl_FragCoord.y;
-    gl_FragColor = texture2D(uInputTexture, vec2(x * 1.0 / uOutputResolution.x, y * 1.0 / uOutputResolution.y));
+    vec2 texel = pixel2uv(vec2(x, y));
+    gl_FragColor = texture2D(uCurrFrame, texel * vec2(2.0, 2.0));
+    if(x > uOutputResolution.x / 2.0) {
+        gl_FragColor = texture2D(uPrevFrame, texel * vec2(2.0, 2.0) - vec2(1.0, 1.0));
+    }
 }
 `;
 
