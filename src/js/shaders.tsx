@@ -19,6 +19,7 @@ vec2 pixel2uv(vec2 pixel) {
     return pixel / uInputResolution;
 }
 
+// computes the mean squared error between the block in currFrame at curr_xy and the block in prevFrame at prev_xy
 float mse(vec2 curr_xy, vec2 prev_xy) {
     float mse = 0.0; // mean squared error
 
@@ -70,17 +71,22 @@ vec3 tss(vec2 xy) {
 }
 
 void main() {
-    float x = gl_FragCoord.x / uOutputResolution.x * uInputResolution.x;
-    float y = gl_FragCoord.y / uOutputResolution.y * uInputResolution.y;
+    vec2 pos = vec2(gl_FragCoord.x, uOutputResolution.y - gl_FragCoord.y) - 0.5;
+    pos *= uInputResolution / uOutputResolution;
+    float x = pos.x;
+    float y = pos.y;
 
     vec3 tss = tss(vec2(x, y));
     vec2 delta = vec2(tss.x, tss.y) - vec2(x, y);
-    
+
     gl_FragColor = vec4(0.5 + delta.x / 15.0, 0.5 + delta.y / 15.0, tss.z / 3.0, 1.0);
+    // gl_FragColor = vec4(0, 0, tss.z / 3.0 * 100.0, 1.0);
 
     // if(tss.z == 0.0) {
     //     gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     // }
+
+    // gl_FragColor = texture2D(uCurrFrame, pixel2uv(vec2(x, y)));
 }
 `;
 
@@ -108,15 +114,18 @@ float round(float x) {
 }
 
 void main() {
-    vec2 uv = gl_FragCoord.xy / uResolution.xy;
+    vec2 pos = vec2(gl_FragCoord.x, uResolution.y - gl_FragCoord.y) - 0.5;
+    vec2 uv = pos / uResolution.xy;
 
     vec2 me_resolution = uResolution / ${blockSize}.0;
-    vec2 me_uv = floor(uv * me_resolution + vec2(0.5, 0.5)) / me_resolution;
+    vec2 me_uv = floor(uv * me_resolution) / me_resolution;
 
     vec4 me = texture2D(uMotionEstimate, me_uv);
 
     vec2 delta = vec2(me.r - 0.5, me.g - 0.5) * 15.0;
-    vec2 sample_xy = gl_FragCoord.xy + vec2(round(delta.x), round(delta.y));
+    vec2 sample_xy = pos + vec2(round(delta.x), round(delta.y));
+
+    gl_FragColor = vec4(1.0-abs(delta.x - round(delta.x)), 1.0-abs(delta.y - round(delta.y)), 0, 1);
 
     vec2 sample_uv = sample_xy / uResolution;
 
@@ -127,6 +136,8 @@ void main() {
     }
 
     // gl_FragColor = vec4(me.b, 0, 0, 1);
+    // gl_FragColor /= 2.0;
+    // gl_FragColor += vec4(me.r / 2.0, me.g / 2.0, me.b / 2.0, 1.0);
 }
 
 `;

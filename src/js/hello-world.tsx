@@ -2,8 +2,8 @@
 export class HelloWorld {
     private x: number = 0;
     private y: number = 0;
-    private vx: number = 5;
-    private vy: number = 5;
+    private vx: number = 1;
+    private vy: number = 1;
 
     constructor(public canvas: HTMLCanvasElement) {
 
@@ -19,7 +19,7 @@ export class HelloWorld {
 
         //draw a square
         ctx.fillStyle = "green";
-        ctx.fillRect(this.x, this.y, 300, 300);
+        ctx.fillRect(this.x, this.y, 305, 305);
 
         this.x += this.vx;
         this.y += this.vy;

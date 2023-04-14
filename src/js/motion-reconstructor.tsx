@@ -72,7 +72,6 @@ export class MotionReconstructor {
         gl.uniform1i(uUseGroundTruth, this.framesDrawn % IFRAME_INTERVAL === 0 ? 1 : 0);
 
         gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
-        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
         this.assignTexture("uPrevFrame", canvas, 0)
         this.assignTexture("uMotionEstimate", meCanvas, 1);

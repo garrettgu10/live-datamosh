@@ -73,9 +73,9 @@ export class MotionEstimator{
         const uOutputResolution = gl.getUniformLocation(this.shaderProgram, "uOutputResolution");
         gl.uniform2fv(uOutputResolution, [gl.canvas.width, gl.canvas.height]);
 
-        this.nextFrame();
         gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
-        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+
+        this.nextFrame();
 
         const aVertexPosition = gl.getAttribLocation(this.shaderProgram, "aVertexPosition");
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);

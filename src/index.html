@@ -2,6 +2,20 @@
 <html>
     <head>
         <title>My First Web Page</title>
+        <style>
+            .stacked {
+                position: relative;
+                width: 640px;
+                height: 480px;
+            }
+            .stacked canvas {
+                opacity: 50%;
+                position: absolute;
+                top: 0;
+                left: 0;
+                image-rendering: pixelated;
+            }
+        </style>
     </head>
     <body>
         <h1>My First Web Page</h1>
@@ -9,10 +23,15 @@
         <video id="video" width="640" height="480" autoplay controls>
             <source src="bun33s.mp4" type="video/mp4">
         </video>
-        <canvas id="incanvas" width="640" height="480" style="width: 640px; display: none"></canvas>
+        <canvas id="incanvas" width="640" height="480" style="width: 640px"></canvas>
         <canvas id="glcanvas" width="640" height="480" style="width: 640px; image-rendering: pixelated;"></canvas>
         <canvas id="outcanvas" width="1920" height="1080" style="width: 640px"></canvas>
-        <canvas id="dbgcanvas" width="1920" height="1080" style="width: 640px"></canvas>
+
+        <div class="stacked">
+            <canvas id="dbgcanvas1" width="1920" height="1080" style="width: 640px"></canvas>
+            <canvas id="dbgcanvas2" width="1920" height="1080" style="width: 640px"></canvas>
+        </div>
+        <button id="btn">My first button</button><br>
         <script type="module" src="js/app.tsx"></script>
     </body>
 </html>
