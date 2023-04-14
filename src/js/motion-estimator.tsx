@@ -10,7 +10,8 @@ export class MotionEstimator{
     public gl: WebGLRenderingContext;
     public constructor(
         public inCanvas: HTMLCanvasElement,
-        public canvas: HTMLCanvasElement
+        public canvas: HTMLCanvasElement,
+        public outCanvas: HTMLCanvasElement,
     ) {
         const gl = canvas.getContext("webgl") as WebGLRenderingContext;
         this.gl = gl;
@@ -65,6 +66,20 @@ export class MotionEstimator{
         gl.uniform1i(uPrevFrame, 1 - this.currentFrameTextureIdx);
     }
 
+    private assignTexture(name: string, canvas: HTMLCanvasElement, idx: number) {
+        const { gl } = this;
+        const textures = [gl.TEXTURE0, gl.TEXTURE1, gl.TEXTURE2];
+        gl.activeTexture(textures[idx]);
+        gl.bindTexture(gl.TEXTURE_2D, this.textures[idx]);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, canvas);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        const uCurrFrame = gl.getUniformLocation(this.shaderProgram, name);
+        gl.uniform1i(uCurrFrame, idx);
+    }
+
     public draw = () => {
         const {gl, inCanvas} = this;
 
@@ -75,7 +90,9 @@ export class MotionEstimator{
 
         gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
 
-        this.nextFrame();
+        // this.nextFrame();
+        this.assignTexture("uCurrFrame", inCanvas, 0);
+        this.assignTexture("uPrevFrame", this.outCanvas, 1);
 
         const aVertexPosition = gl.getAttribLocation(this.shaderProgram, "aVertexPosition");
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);

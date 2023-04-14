@@ -43,7 +43,7 @@ function main() {
     const canvas = document.getElementById("glcanvas") as HTMLCanvasElement;
     const outCanvas = document.getElementById("outcanvas") as HTMLCanvasElement;
 
-    estimator = new MotionEstimator(inCanvas, canvas);
+    estimator = new MotionEstimator(inCanvas, canvas, outCanvas);
     target = new VideoPlayer(inCanvas, document.getElementById("video") as HTMLVideoElement);
     // target = new HelloWorld(inCanvas);
     reconstructor = new MotionReconstructor(inCanvas, canvas, outCanvas);
@@ -51,3 +51,8 @@ function main() {
 }
 
 window.onload = main;
+
+document.getElementById('btn')?.addEventListener('click', () => {
+    const video = document.getElementById("video") as HTMLVideoElement;
+    video.play();
+});

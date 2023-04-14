@@ -79,7 +79,7 @@ void main() {
     vec3 tss = tss(vec2(x, y));
     vec2 delta = vec2(tss.x, tss.y) - vec2(x, y);
 
-    gl_FragColor = vec4(0.5 + delta.x / 15.0, 0.5 + delta.y / 15.0, tss.z / 3.0, 1.0);
+    gl_FragColor = vec4(0.5 + delta.x / 15.0, 0.5 + delta.y / 15.0, tss.z / 3.0 * 300.0, 1.0);
     // gl_FragColor = vec4(0, 0, tss.z / 3.0 * 100.0, 1.0);
 
     // if(tss.z == 0.0) {
@@ -131,8 +131,9 @@ void main() {
 
     gl_FragColor = texture2D(uPrevFrame, sample_uv);
 
-    if (me.b > ${mseThresh} || uUseGroundTruth) {
+    if (me.b / 300.0 > ${mseThresh} || uUseGroundTruth) {
         gl_FragColor = texture2D(uGroundTruth, uv);
+        // gl_FragColor.b = 1.0;
     }
 
     // gl_FragColor = vec4(me.b, 0, 0, 1);
