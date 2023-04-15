@@ -79,7 +79,7 @@ vec3 tss(vec2 xy) {
 
 void main() {
     // vec2 pos = vec2(gl_FragCoord.x, uOutputResolution.y - gl_FragCoord.y) - 0.5;
-    vec2 pos = frag_xy;
+    vec2 pos = frag_xy - vec2(0.5, 0.5);
     pos *= uInputResolution / uOutputResolution;
     float x = pos.x;
     float y = pos.y;
@@ -95,7 +95,7 @@ void main() {
     // }
 
     // gl_FragColor = texture2D(uCurrFrame, pixel2uv(vec2(x, y)));
-    gl_FragColor = vec4((vec2(gl_FragCoord.x, uOutputResolution.y - gl_FragCoord.y) - 0.5) / uOutputResolution, 0.0, 1.0);
+    // gl_FragColor = vec4((frag_xy - vec2(0.5, 0.5)) / uOutputResolution, 0.0, 1.0);
 }
 `;
 
@@ -129,7 +129,7 @@ float round(float x) {
 
 void main() {
     // vec2 pos = vec2(gl_FragCoord.x, uResolution.y - gl_FragCoord.y) - 0.5;
-    vec2 pos = frag_xy;
+    vec2 pos = frag_xy - vec2(0.5, 0.5);
     vec2 uv = pos / uResolution.xy;
 
     vec2 me_resolution = uResolution / ${blockSize}.0;
@@ -156,7 +156,7 @@ void main() {
     // gl_FragColor /= 2.0;
     // gl_FragColor += vec4(me.r / 2.0, me.g / 2.0, me.b / 2.0, 1.0);
 
-    gl_FragColor = vec4(1.0, gl_FragCoord.xy == frag_xy? 1.0: 0.0, 0.0, 1.0);
+    // gl_FragColor = vec4(1.0, gl_FragCoord.xy == frag_xy? 1.0: 0.0, 0.0, 1.0);
 }
 
 `;
