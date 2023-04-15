@@ -3,7 +3,7 @@ import { MotionEstimator } from "./motion-estimator";
 import { MotionReconstructor } from "./motion-reconstructor";
 import { VideoPlayer } from "./targets/video-player";
 
-import { FRAME_RATE, MSE_SCALE, MSE_THRESH } from "./consts";
+import { FRAME_RATE } from "./consts";
 import { CameraFeed } from "./targets/camera-feed";
 import {Target} from "./targets/target";
 
@@ -20,7 +20,7 @@ function draw() {
 
     setTimeout(() => {
         requestAnimationFrame(draw);
-    },  1000 / 30);
+    },  1000 / FRAME_RATE);
 }
 
 function dbg() {
@@ -36,7 +36,7 @@ function dbg() {
     for(let i = 0; i < imgData.length / 4; i++) {
         let b = imgData[i * 4 + 2];
 
-        let bailedOut = b / 255.0 > MSE_THRESH * MSE_SCALE;
+        let bailedOut = b / 255.0 > 0.9;
         bailedOut ||= reconstructor.isIframe();
 
         imgData[i * 4] = bailedOut ? 255: 0;

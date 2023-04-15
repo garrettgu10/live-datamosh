@@ -1,4 +1,3 @@
-import { MSE_SCALE } from "./consts";
 
 export const motionEstimateVertexShader = `
 precision highp float;
@@ -12,7 +11,7 @@ void main() {
     frag_xy = aXY;
 }`;
 
-export const motionEstimateFragmentShader = (blockSize: number) => `
+export const motionEstimateFragmentShader = (blockSize: number, mseThresh: number) => `
 precision highp float;
 
 varying vec2 frag_xy;
@@ -87,7 +86,7 @@ void main() {
     vec3 tss = tss(vec2(x, y));
     vec2 delta = vec2(tss.x, tss.y) - vec2(x, y);
 
-    gl_FragColor = vec4(0.5 + delta.x / 15.0, 0.5 + delta.y / 15.0, tss.z / 3.0 * ${MSE_SCALE}.0, 1.0);
+    gl_FragColor = vec4(0.5 + delta.x / 15.0, 0.5 + delta.y / 15.0, tss.z / 3.0 * float(${0.9 / mseThresh}), 1.0);
     // gl_FragColor = vec4(0, 0, tss.z / 3.0 * 100.0, 1.0);
 
     // if(tss.z == 0.0) {
@@ -148,7 +147,7 @@ void main() {
     gl_FragColor = texture2D(uPrevFrame, sample_uv);
     // gl_FragColor = texture2D(uMotionEstimate, me_uv);
 
-    if (me.b > float(${mseThresh * MSE_SCALE})) {
+    if (me.b > 0.9) {
         gl_FragColor = texture2D(uGroundTruth, uv);
         // gl_FragColor.a = 0.8;
         // gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
@@ -163,7 +162,7 @@ void main() {
     // if(uv.x > 0.5) {
     //     vec2 new_uv = vec2(uv.x - 0.5, uv.y);
     //     gl_FragColor = texture2D(uPrevFrame, new_uv);
-    //     // if(gl_FragColor.b > float(${mseThresh * MSE_SCALE})){
+    //     // if(gl_FragColor.b > 0.9){
     //     //     gl_FragColor = texture2D(uGroundTruth, new_uv);
     //     // }
     // }

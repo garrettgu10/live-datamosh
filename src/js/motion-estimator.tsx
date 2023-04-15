@@ -1,5 +1,5 @@
 import {motionEstimateVertexShader, motionEstimateFragmentShader, buildShaderProgram} from "./shaders";
-import {BLOCK_SIZE} from "./consts";
+import {BLOCK_SIZE, MSE_THRESH} from "./consts";
 
 export class MotionEstimator{
     private shaderProgram: WebGLProgram;
@@ -24,7 +24,7 @@ export class MotionEstimator{
     
         const shaderSet = [
             {type: gl.VERTEX_SHADER, src: motionEstimateVertexShader},
-            {type: gl.FRAGMENT_SHADER, src: motionEstimateFragmentShader(BLOCK_SIZE)}
+            {type: gl.FRAGMENT_SHADER, src: motionEstimateFragmentShader(BLOCK_SIZE, MSE_THRESH)}
         ];
 
         canvas.width = inCanvas.width / BLOCK_SIZE;
