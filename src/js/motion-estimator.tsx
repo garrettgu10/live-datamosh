@@ -7,6 +7,8 @@ export class MotionEstimator{
     private vertexBuffer: WebGLBuffer;
     private textures: WebGLTexture[];
     private currentFrameTextureIdx: number;
+    private xyArray: Float32Array;
+    private xyBuffer: WebGLBuffer;
     public gl: WebGLRenderingContext;
     public constructor(
         public inCanvas: HTMLCanvasElement,
@@ -34,6 +36,11 @@ export class MotionEstimator{
             -1, 1, 1, 1, 1, -1, -1, 1, 1, -1, -1, -1,
         ]);
 
+        const {width, height} = canvas;
+        this.xyArray = new Float32Array([
+            0, 0, width, 0, width, height, 0, 0, width, height, 0, height,
+        ])
+
         gl.viewport(0, 0, canvas.width, canvas.height);
         gl.clearColor(0, 0, 0, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
@@ -41,6 +48,7 @@ export class MotionEstimator{
         gl.useProgram(this.shaderProgram);
 
         this.vertexBuffer = gl.createBuffer() as WebGLBuffer;
+        this.xyBuffer = gl.createBuffer() as WebGLBuffer;
         this.textures = [gl.createTexture() as WebGLTexture, gl.createTexture() as WebGLTexture];
         this.currentFrameTextureIdx = 0;
     }
@@ -100,6 +108,19 @@ export class MotionEstimator{
         gl.enableVertexAttribArray(aVertexPosition);
         gl.vertexAttribPointer(
             aVertexPosition,
+            2,
+            gl.FLOAT,
+            false,
+            0,
+            0
+        );
+
+        const aXY = gl.getAttribLocation(this.shaderProgram, "aXY");
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.xyBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, this.xyArray, gl.STATIC_DRAW);
+        gl.enableVertexAttribArray(aXY);
+        gl.vertexAttribPointer(
+            aXY,
             2,
             gl.FLOAT,
             false,

@@ -5,6 +5,8 @@ export class MotionReconstructor {
     private shaderProgram: WebGLProgram;
     private vertexArray: Float32Array;
     private vertexBuffer: WebGLBuffer;
+    private xyArray: Float32Array;
+    private xyBuffer: WebGLBuffer;
     private framesDrawn: number = 0;
     public gl: WebGLRenderingContext;
     private textures: WebGLTexture[];
@@ -34,6 +36,11 @@ export class MotionReconstructor {
             -1, 1, 1, 1, 1, -1, -1, 1, 1, -1, -1, -1,
         ]);
 
+        const { width, height } = canvas;
+        this.xyArray = new Float32Array([
+            0, 0, width, 0, width, height, 0, 0, width, height, 0, height,
+        ]);
+
         gl.viewport(0, 0, canvas.width, canvas.height);
         gl.clearColor(0, 0, 0, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
@@ -41,6 +48,7 @@ export class MotionReconstructor {
         gl.useProgram(this.shaderProgram);
 
         this.vertexBuffer = gl.createBuffer() as WebGLBuffer;
+        this.xyBuffer = gl.createBuffer() as WebGLBuffer;
 
         this.textures = [];
         for(let i = 0; i < 3; i++) {
@@ -88,6 +96,19 @@ export class MotionReconstructor {
         gl.vertexAttribPointer(
             aVertexPosition,
             2,
+            gl.FLOAT,
+            false,
+            0,
+            0
+        );
+
+        const aXY = gl.getAttribLocation(this.shaderProgram, "aXY");
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.xyBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, this.xyArray, gl.STATIC_DRAW);
+        gl.enableVertexAttribArray(aXY);
+        gl.vertexAttribPointer(
+            aXY,
+            2,  
             gl.FLOAT,
             false,
             0,

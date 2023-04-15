@@ -18,9 +18,9 @@ function draw() {
 
     dbg();
 
-    setTimeout(() => {
-        requestAnimationFrame(draw);
-    },  1000 / 30);
+    // setTimeout(() => {
+    //     requestAnimationFrame(draw);
+    // },  1000 / 30);
 }
 
 function dbg() {
@@ -34,10 +34,7 @@ function dbg() {
     dbgCtx1.drawImage(canvas, 0, 0);
     const imgData = dbgCtx1.getImageData(0, 0, canvas.width, canvas.height).data;
     for(let i = 0; i < imgData.length / 4; i++) {
-        let r = imgData[i * 4];
-        let g = imgData[i * 4 + 1];
         let b = imgData[i * 4 + 2];
-        let a = imgData[i * 4 + 3];
 
         let bailedOut = b / 255.0 > MSE_THRESH * MSE_SCALE;
         bailedOut ||= reconstructor.isIframe();
@@ -76,4 +73,8 @@ document.getElementById('target-btn')?.addEventListener('click', () => {
     currTarget = (currTarget + 1) % targets.length;
     (document.getElementById("video") as HTMLVideoElement).play();
     (document.getElementById("webcam-video") as HTMLVideoElement).play();
+});
+
+document.getElementById("dbg-btn")?.addEventListener('click', () => {
+    draw();
 });
