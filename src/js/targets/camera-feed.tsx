@@ -6,7 +6,7 @@ export class CameraFeed implements Target {
         //draw image from webcam
         var localStreamConstraints = {
             audio: true,
-            video: { width: 1920, height: 1080 },
+            video: { width: 1280, height: 720 },
         };
 
         if (this.video) {
