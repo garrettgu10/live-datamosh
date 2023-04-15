@@ -1,5 +1,5 @@
 import { motionReconstructFragmentShader, motionReconstructVertexShader, buildShaderProgram } from "./shaders";
-import { BLOCK_SIZE, MSE_THRESH, IFRAME_INTERVAL } from "./consts";
+import { BLOCK_SIZE, MSE_THRESH, IFRAME_INTERVAL, IFRAME_THRESH } from "./consts";
 
 export class MotionReconstructor {
     private shaderProgram: WebGLProgram;
@@ -7,9 +7,10 @@ export class MotionReconstructor {
     private vertexBuffer: WebGLBuffer;
     private xyArray: Float32Array;
     private xyBuffer: WebGLBuffer;
-    private framesDrawn: number = 0;
+    public iframeCountdown: number = 0;
     public gl: WebGLRenderingContext;
     private textures: WebGLTexture[];
+
     public constructor(
         public inCanvas: HTMLCanvasElement,
         public meCanvas: HTMLCanvasElement,
@@ -56,8 +57,20 @@ export class MotionReconstructor {
         }
     }
 
+    public iframeNeeded(motionEstimate: Uint8ClampedArray): boolean {
+        let count = 0;
+        for(let i = 0; i < motionEstimate.length / 4; i++) {
+            let b = motionEstimate[i * 4 + 2];
+    
+            let bailedOut = b / 255.0 > 0.9;
+
+            count += bailedOut ? 1 : 0;
+        }
+        return count / (motionEstimate.length / 4) > IFRAME_THRESH;
+    }
+
     public isIframe() {
-        return this.framesDrawn % IFRAME_INTERVAL === 0;
+        return this.iframeCountdown <= 0;
     }
 
     private assignTexture(name: string, canvas: HTMLCanvasElement, idx: number) {
@@ -81,7 +94,7 @@ export class MotionReconstructor {
         gl.uniform2f(uResolution, canvas.width, canvas.height);
 
         const uUseGroundTruth = gl.getUniformLocation(this.shaderProgram, "uUseGroundTruth");
-        gl.uniform1i(uUseGroundTruth, this.framesDrawn % IFRAME_INTERVAL === 0 ? 1 : 0);
+        gl.uniform1i(uUseGroundTruth, this.iframeCountdown <= 0 ? 1 : 0);
 
         gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
 
@@ -116,8 +129,11 @@ export class MotionReconstructor {
         );
     
         gl.drawArrays(gl.TRIANGLES, 0, this.vertexArray.length / 2);
-
-        this.framesDrawn++;
+        
+        this.iframeCountdown--;
+        if(this.iframeCountdown < 0) {
+            this.iframeCountdown = IFRAME_INTERVAL;
+        }
     }
 
 

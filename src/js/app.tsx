@@ -33,6 +33,11 @@ function dbg() {
     const dbgCtx1 = dbgCanvas1.getContext("2d") as CanvasRenderingContext2D;
     dbgCtx1.drawImage(canvas, 0, 0);
     const imgData = dbgCtx1.getImageData(0, 0, canvas.width, canvas.height).data;
+
+    if(reconstructor.iframeNeeded(imgData)) {
+        reconstructor.iframeCountdown = 0;
+    }
+
     for(let i = 0; i < imgData.length / 4; i++) {
         let b = imgData[i * 4 + 2];
 
