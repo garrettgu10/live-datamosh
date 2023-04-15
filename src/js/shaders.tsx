@@ -133,7 +133,7 @@ void main() {
     vec2 uv = pos / uResolution.xy;
 
     vec2 me_resolution = uResolution / ${blockSize}.0;
-    vec2 me_xy = floor(uv * me_resolution);
+    vec2 me_xy = floor(uv * me_resolution) + vec2(0.5, 0.5);
     vec2 me_uv = me_xy / me_resolution;
 
     vec4 me = texture2D(uMotionEstimate, me_uv);
@@ -146,17 +146,34 @@ void main() {
     vec2 sample_uv = sample_xy / uResolution;
 
     gl_FragColor = texture2D(uPrevFrame, sample_uv);
+    // gl_FragColor = texture2D(uMotionEstimate, me_uv);
 
-    if (me.b > float(${mseThresh * MSE_SCALE}) || uUseGroundTruth) {
+    if (me.b > float(${mseThresh * MSE_SCALE})) {
         gl_FragColor = texture2D(uGroundTruth, uv);
+        // gl_FragColor.a = 0.8;
+        // gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
         // gl_FragColor.b = 1.0;
     }
+    // gl_FragColor = me;
+
+    if(uUseGroundTruth) {
+        gl_FragColor = texture2D(uGroundTruth, uv);
+    }
+
+    // if(uv.x > 0.5) {
+    //     vec2 new_uv = vec2(uv.x - 0.5, uv.y);
+    //     gl_FragColor = texture2D(uPrevFrame, new_uv);
+    //     // if(gl_FragColor.b > float(${mseThresh * MSE_SCALE})){
+    //     //     gl_FragColor = texture2D(uGroundTruth, new_uv);
+    //     // }
+    // }
 
     // gl_FragColor = vec4(me.b, 0, 0, 1);
     // gl_FragColor /= 2.0;
     // gl_FragColor += vec4(me.r / 2.0, me.g / 2.0, me.b / 2.0, 1.0);
 
     // gl_FragColor = vec4(1.0, gl_FragCoord.xy == frag_xy? 1.0: 0.0, 0.0, 1.0);
+    // gl_FragColor = vec4(me_uv, 0.0, 1.0);
 }
 
 `;
