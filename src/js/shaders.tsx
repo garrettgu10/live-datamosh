@@ -34,8 +34,8 @@ float mse(vec2 curr_xy, vec2 prev_xy) {
         for(int j = 0; j < ${blockSize}; j++) {
             vec2 curr_uv = pixel2uv(curr_xy + vec2(float(i), float(j)));
             vec2 prev_uv = pixel2uv(prev_xy + vec2(float(i), float(j)));
-            vec4 curr = texture2D(uCurrFrame, curr_uv + vec2(0.25, 0.25) / uInputResolution);
-            vec4 prev = texture2D(uPrevFrame, prev_uv + vec2(0.25, 0.25) / uInputResolution);
+            vec4 curr = texture2D(uCurrFrame, curr_uv);
+            vec4 prev = texture2D(uPrevFrame, prev_uv);
             mse += pow(curr.r - prev.r, 2.0) + pow(curr.g - prev.g, 2.0) + pow(curr.b - prev.b, 2.0);
         }
     }
@@ -95,6 +95,7 @@ void main() {
     // }
 
     // gl_FragColor = texture2D(uCurrFrame, pixel2uv(vec2(x, y)));
+    gl_FragColor = vec4((vec2(gl_FragCoord.x, uOutputResolution.y - gl_FragCoord.y) - 0.5) / uOutputResolution, 0.0, 1.0);
 }
 `;
 
@@ -135,7 +136,7 @@ void main() {
     vec2 me_xy = floor(uv * me_resolution);
     vec2 me_uv = me_xy / me_resolution;
 
-    vec4 me = texture2D(uMotionEstimate, me_uv + vec2(0.5 / me_resolution.x, 0.5 / me_resolution.y));
+    vec4 me = texture2D(uMotionEstimate, me_uv);
 
     vec2 delta = vec2(me.r - 0.5, me.g - 0.5) * 15.0;
     vec2 sample_xy = pos + vec2(round(delta.x), round(delta.y));
@@ -144,16 +145,18 @@ void main() {
 
     vec2 sample_uv = sample_xy / uResolution;
 
-    gl_FragColor = texture2D(uPrevFrame, sample_uv + vec2(0.5 / uResolution.x, 0.5 / uResolution.y));
+    gl_FragColor = texture2D(uPrevFrame, sample_uv);
 
     if (me.b > float(${mseThresh * MSE_SCALE}) || uUseGroundTruth) {
-        gl_FragColor = texture2D(uGroundTruth, uv + vec2(0.5 / uResolution.x, 0.5 / uResolution.y));
+        gl_FragColor = texture2D(uGroundTruth, uv);
         // gl_FragColor.b = 1.0;
     }
 
     // gl_FragColor = vec4(me.b, 0, 0, 1);
     // gl_FragColor /= 2.0;
     // gl_FragColor += vec4(me.r / 2.0, me.g / 2.0, me.b / 2.0, 1.0);
+
+    gl_FragColor = vec4(1.0, gl_FragCoord.xy == frag_xy? 1.0: 0.0, 0.0, 1.0);
 }
 
 `;

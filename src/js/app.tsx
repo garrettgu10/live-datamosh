@@ -18,9 +18,9 @@ function draw() {
 
     dbg();
 
-    // setTimeout(() => {
-    //     requestAnimationFrame(draw);
-    // },  1000 / 30);
+    setTimeout(() => {
+        requestAnimationFrame(draw);
+    },  1000 / 30);
 }
 
 function dbg() {
