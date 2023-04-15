@@ -18,9 +18,9 @@ function draw() {
 
     dbg();
 
-    // setTimeout(() => {
-    //     requestAnimationFrame(draw);
-    // },  1000 / 30);
+    setTimeout(() => {
+        requestAnimationFrame(draw);
+    },  1000 / 30);
 }
 
 function dbg() {
@@ -75,6 +75,6 @@ document.getElementById('target-btn')?.addEventListener('click', () => {
     (document.getElementById("webcam-video") as HTMLVideoElement).play();
 });
 
-document.getElementById("dbg-btn")?.addEventListener('click', () => {
-    draw();
-});
+// document.getElementById("dbg-btn")?.addEventListener('click', () => {
+//     draw();
+// });
