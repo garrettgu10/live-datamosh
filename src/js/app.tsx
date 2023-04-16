@@ -8,13 +8,27 @@ import { CameraFeed } from "./targets/camera-feed";
 import {Target} from "./targets/target";
 
 let estimator: MotionEstimator;
-let targets: Target[] = [];
-let currTarget = 0;
-let reconstructor: MotionReconstructor;
+let sources: Target[] = [];
+const pFrameSrcIdx: number = 0;
+let srcReconstructor: MotionReconstructor;
+let destReconstructor: MotionReconstructor;
 function draw() {
-    targets[currTarget].draw();
+    for(let source of sources) {
+        source.draw();
+    }
+
+    const pFrameSrc = sources[pFrameSrcIdx];
+    const pFrameSrcCanvas = pFrameSrc.canvas;
+    const inCanvas = estimator.inCanvas;
+
+    const inCtx = inCanvas.getContext("2d") as CanvasRenderingContext2D;
+    const pFrameSrcCtx = pFrameSrcCanvas.getContext("2d") as CanvasRenderingContext2D;
+    const imgData = pFrameSrcCtx.getImageData(0, 0, pFrameSrcCanvas.width, pFrameSrcCanvas.height);
+    inCtx.putImageData(imgData, 0, 0);
+
     estimator.draw();
-    reconstructor.draw();
+    srcReconstructor.draw();
+    destReconstructor.draw();
 
     dbg();
 
@@ -34,15 +48,15 @@ function dbg() {
     dbgCtx1.drawImage(canvas, 0, 0);
     const imgData = dbgCtx1.getImageData(0, 0, canvas.width, canvas.height).data;
 
-    if(reconstructor.iframeNeeded(imgData)) {
-        reconstructor.iframeCountdown = 0;
+    if(srcReconstructor.iframeNeeded(imgData)) {
+        srcReconstructor.iframeCountdown = 0;
     }
 
     for(let i = 0; i < imgData.length / 4; i++) {
         let b = imgData[i * 4 + 2];
 
         let bailedOut = b / 255.0 > 0.9;
-        bailedOut ||= reconstructor.isIframe();
+        bailedOut ||= srcReconstructor.isIframe();
 
         imgData[i * 4] = bailedOut ? 255: 0;
         imgData[i * 4 + 1] = 0;
@@ -64,18 +78,24 @@ function main() {
     const canvas = document.getElementById("glcanvas") as HTMLCanvasElement;
     const outCanvas = document.getElementById("outcanvas") as HTMLCanvasElement;
 
+    const src1Canvas = document.getElementById("src1canvas") as HTMLCanvasElement;
+    const src2Canvas = document.getElementById("src2canvas") as HTMLCanvasElement;
+    const destCanvas = document.getElementById("destcanvas") as HTMLCanvasElement;
+
     estimator = new MotionEstimator(inCanvas, canvas, outCanvas);
-    targets.push(new HelloWorld(inCanvas));
-    targets.push(new VideoPlayer(inCanvas, document.getElementById("video") as HTMLVideoElement));
-    targets.push(new CameraFeed(inCanvas, document.getElementById("webcam-video") as HTMLVideoElement));
-    reconstructor = new MotionReconstructor(inCanvas, canvas, outCanvas);
+    // sources.push(new HelloWorld(src1Canvas));
+    sources.push(new CameraFeed(src1Canvas, document.getElementById("webcam-video") as HTMLVideoElement));
+    sources.push(new VideoPlayer(src2Canvas, document.getElementById("video") as HTMLVideoElement));
+    srcReconstructor = new MotionReconstructor(inCanvas, canvas, outCanvas);
+    destReconstructor = new MotionReconstructor(src2Canvas, canvas, destCanvas);
+
     draw();
 }
 
 window.onload = main;
 
 document.getElementById('target-btn')?.addEventListener('click', () => {
-    currTarget = (currTarget + 1) % targets.length;
+    // currTarget = (currTarget + 1) % targets.length;
     (document.getElementById("video") as HTMLVideoElement).play();
     (document.getElementById("webcam-video") as HTMLVideoElement).play();
 });
