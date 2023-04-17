@@ -5,7 +5,7 @@ import { VideoPlayer } from "./targets/video-player";
 
 import { FRAME_RATE } from "./consts";
 import { CameraFeed } from "./targets/camera-feed";
-import {Target} from "./targets/target";
+import {Target, VideoTarget} from "./targets/target";
 
 let estimator: MotionEstimator;
 let sources: Target[] = [];
@@ -84,8 +84,8 @@ function main() {
 
     estimator = new MotionEstimator(inCanvas, canvas, outCanvas);
     // sources.push(new HelloWorld(src1Canvas));
-    sources.push(new CameraFeed(src1Canvas, document.getElementById("webcam-video") as HTMLVideoElement));
-    sources.push(new VideoPlayer(src2Canvas, document.getElementById("video") as HTMLVideoElement));
+    sources.push(new CameraFeed(src1Canvas));
+    sources.push(new VideoPlayer(src2Canvas, require("url:../videos/bun33s.mp4")));
     srcReconstructor = new MotionReconstructor(inCanvas, canvas, outCanvas);
     destReconstructor = new MotionReconstructor(src2Canvas, canvas, destCanvas);
 
@@ -96,8 +96,8 @@ window.onload = main;
 
 document.getElementById('target-btn')?.addEventListener('click', () => {
     // currTarget = (currTarget + 1) % targets.length;
-    (document.getElementById("video") as HTMLVideoElement).play();
-    (document.getElementById("webcam-video") as HTMLVideoElement).play();
+    (sources[0] as VideoTarget).attachVideo(document.getElementById("video1") as HTMLVideoElement);
+    (sources[1] as VideoTarget).attachVideo(document.getElementById("video2") as HTMLVideoElement);
 });
 
 document.getElementById("dbg-btn")?.addEventListener('click', () => {
