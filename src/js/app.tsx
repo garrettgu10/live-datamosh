@@ -7,11 +7,14 @@ import { FRAME_RATE } from "./consts";
 import { CameraFeed } from "./targets/camera-feed";
 import {Target, VideoTarget} from "./targets/target";
 
+import { SettingsManager } from "./settings";
+
 let estimator: MotionEstimator;
 let sources: Target[] = [];
 const pFrameSrcIdx: number = 0;
 let srcReconstructor: MotionReconstructor;
 let destReconstructor: MotionReconstructor;
+let settingsManager: SettingsManager;
 function draw() {
     for(let source of sources) {
         source.draw();
@@ -85,9 +88,13 @@ function main() {
     estimator = new MotionEstimator(inCanvas, canvas, outCanvas);
     // sources.push(new HelloWorld(src1Canvas));
     sources.push(new CameraFeed(src1Canvas));
-    sources.push(new VideoPlayer(src2Canvas, require("url:../videos/bun33s.mp4")));
+    // @ts-ignore
+    sources.push(new VideoPlayer(src2Canvas, require("url:../videos/bun33s.mp4") as string));
     srcReconstructor = new MotionReconstructor(inCanvas, canvas, outCanvas);
     destReconstructor = new MotionReconstructor(src2Canvas, canvas, destCanvas);
+
+    settingsManager = new SettingsManager(srcReconstructor, destReconstructor);
+    settingsManager.mount();
 
     draw();
 }

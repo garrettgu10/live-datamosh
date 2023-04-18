@@ -11,6 +11,9 @@ export class MotionReconstructor {
     public gl: WebGLRenderingContext;
     private textures: WebGLTexture[];
 
+    public iframeInterval: number = IFRAME_INTERVAL;
+    public iframeThreshold: number = IFRAME_THRESH;
+
     public constructor(
         public inCanvas: HTMLCanvasElement,
         public meCanvas: HTMLCanvasElement,
@@ -61,12 +64,12 @@ export class MotionReconstructor {
         let count = 0;
         for(let i = 0; i < motionEstimate.length / 4; i++) {
             let b = motionEstimate[i * 4 + 2];
-    
+
             let bailedOut = b / 255.0 > 0.9;
 
             count += bailedOut ? 1 : 0;
         }
-        return count / (motionEstimate.length / 4) > IFRAME_THRESH;
+        return count / (motionEstimate.length / 4) > this.iframeThreshold;
     }
 
     public isIframe() {
@@ -129,10 +132,10 @@ export class MotionReconstructor {
         );
     
         gl.drawArrays(gl.TRIANGLES, 0, this.vertexArray.length / 2);
-        
+
         this.iframeCountdown--;
         if(this.iframeCountdown < 0) {
-            this.iframeCountdown = IFRAME_INTERVAL;
+            this.iframeCountdown = this.iframeInterval;
         }
     }
 
