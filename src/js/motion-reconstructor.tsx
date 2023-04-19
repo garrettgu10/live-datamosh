@@ -14,12 +14,16 @@ export class MotionReconstructor {
     public iframeInterval: number = IFRAME_INTERVAL;
     public iframeThreshold: number = IFRAME_THRESH;
 
+    public iblockSrcIdx: number = 1;
+    public iframeSrcIdx: number = 1;
+
     public constructor(
-        public inCanvas: HTMLCanvasElement,
+        public inCanvas0: HTMLCanvasElement,
+        public inCanvas1: HTMLCanvasElement,
         public meCanvas: HTMLCanvasElement,
-        public canvas: HTMLCanvasElement
+        public outCanvas: HTMLCanvasElement
     ) {
-        const gl = canvas.getContext("webgl", {preserveDrawingBuffer: true}) as WebGLRenderingContext;
+        const gl = outCanvas.getContext("webgl", {preserveDrawingBuffer: true}) as WebGLRenderingContext;
         this.gl = gl;
         if (gl === null) {
             alert("Unable to initialize WebGL. Your browser or machine may not support it.");
@@ -31,8 +35,10 @@ export class MotionReconstructor {
             { type: gl.FRAGMENT_SHADER, src: motionReconstructFragmentShader(BLOCK_SIZE, MSE_THRESH) }
         ];
 
-        canvas.width = inCanvas.width;
-        canvas.height = inCanvas.height;
+        inCanvas1.width = inCanvas0.width;
+        inCanvas1.height = inCanvas0.height;
+        outCanvas.width = inCanvas0.width;
+        outCanvas.height = inCanvas0.height;
 
         this.shaderProgram = buildShaderProgram(gl, shaderSet);
 
@@ -40,12 +46,12 @@ export class MotionReconstructor {
             -1, 1, 1, 1, 1, -1, -1, 1, 1, -1, -1, -1,
         ]);
 
-        const { width, height } = canvas;
+        const { width, height } = outCanvas;
         this.xyArray = new Float32Array([
             0, 0, width, 0, width, height, 0, 0, width, height, 0, height,
         ]);
 
-        gl.viewport(0, 0, canvas.width, canvas.height);
+        gl.viewport(0, 0, outCanvas.width, outCanvas.height);
         gl.clearColor(0, 0, 0, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -55,7 +61,7 @@ export class MotionReconstructor {
         this.xyBuffer = gl.createBuffer() as WebGLBuffer;
 
         this.textures = [];
-        for(let i = 0; i < 3; i++) {
+        for(let i = 0; i < 4; i++) {
             this.textures[i] = gl.createTexture() as WebGLTexture;
         }
     }
@@ -78,7 +84,7 @@ export class MotionReconstructor {
 
     private assignTexture(name: string, canvas: HTMLCanvasElement, idx: number) {
         const { gl } = this;
-        const textures = [gl.TEXTURE0, gl.TEXTURE1, gl.TEXTURE2];
+        const textures = [gl.TEXTURE0, gl.TEXTURE1, gl.TEXTURE2, gl.TEXTURE3];
         gl.activeTexture(textures[idx]);
         gl.bindTexture(gl.TEXTURE_2D, this.textures[idx]);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, canvas);
@@ -91,19 +97,21 @@ export class MotionReconstructor {
     }
 
     public draw = () => {
-        const {gl, inCanvas, meCanvas, canvas} = this;
+        const {gl, inCanvas0, inCanvas1, meCanvas, outCanvas: canvas} = this;
+        const inCanvases = [inCanvas0, inCanvas1];
 
         const uResolution = gl.getUniformLocation(this.shaderProgram, "uResolution");
         gl.uniform2f(uResolution, canvas.width, canvas.height);
 
-        const uUseGroundTruth = gl.getUniformLocation(this.shaderProgram, "uUseGroundTruth");
-        gl.uniform1i(uUseGroundTruth, this.iframeCountdown <= 0 ? 1 : 0);
+        const uIsIframe = gl.getUniformLocation(this.shaderProgram, "uIsIframe");
+        gl.uniform1i(uIsIframe, this.iframeCountdown <= 0 ? 1 : 0);
 
         gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
 
-        this.assignTexture("uPrevFrame", canvas, 0)
+        this.assignTexture("uPrevFrame", canvas, 0);
         this.assignTexture("uMotionEstimate", meCanvas, 1);
-        this.assignTexture("uGroundTruth", inCanvas, 2);
+        this.assignTexture("uIblockSrc", inCanvases[this.iblockSrcIdx], 2);
+        this.assignTexture("uIframe", inCanvases[this.iframeSrcIdx], 3);
 
         const aVertexPosition = gl.getAttribLocation(this.shaderProgram, "aVertexPosition");
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);

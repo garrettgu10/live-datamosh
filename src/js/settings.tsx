@@ -19,6 +19,25 @@ export class SettingsManager {
         iframeThresholdInput.addEventListener("change", (e) => {
             this.setIframeThreshold(parseInt(iframeThresholdInput.value));
         });
+
+        const iframeSourceInput = document.getElementById("iframe-source") as HTMLSelectElement;
+        iframeSourceInput.addEventListener("change", (e) => {
+            this.setIframeSrc(parseInt(iframeSourceInput.value));
+        });
+
+        const iblockSourceInput = document.getElementById("iblock-source") as HTMLSelectElement;
+        iblockSourceInput.addEventListener("change", (e) => {
+            this.setIblockSrc(parseInt(iblockSourceInput.value));
+        });
+
+    }
+
+    setIframeSrc(idx: number) {
+        this.destReconstructor.iframeSrcIdx = idx;
+    }
+
+    setIblockSrc(idx: number) {
+        this.destReconstructor.iblockSrcIdx = idx;
     }
 
     setIframeInterval(interval: number) {

@@ -21,7 +21,7 @@ export class MotionEstimator{
             alert("Unable to initialize WebGL. Your browser or machine may not support it.");
             return;
         }
-    
+
         const shaderSet = [
             {type: gl.VERTEX_SHADER, src: motionEstimateVertexShader},
             {type: gl.FRAGMENT_SHADER, src: motionEstimateFragmentShader(BLOCK_SIZE, MSE_THRESH)}

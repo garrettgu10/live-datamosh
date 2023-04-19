@@ -25,12 +25,22 @@
     <body>
         <h1>My First Web Page</h1>
         <p>My first paragraph.</p>
-        <button id="target-btn">My first button</button><button id="dbg-btn">My second button</button><br><br>
+        <button id="begin-btn">begin</button><button id="iframe-btn">force iframe</button><br><br>
         <form>
             <label for="iframe-interval">iframe interval:</label>
             <input type="number" id="iframe-interval" name="iframe-interval" value="1000"><br><br>
             <label for="iframe-threshold">iframe threshold:</label>
             <input type="number" id="iframe-threshold" name="iframe-threshold" value="0.1"><br><br>
+            <label for="iframe-source">iframe source:</label>
+            <select id="iframe-source" name="iframe-source">
+                <option value="0">left</option>
+                <option value="1" selected>right</option>
+            </select>
+            <label for="iblock-source">iblock source:</label>
+            <select id="iblock-source" name="iblock-source">
+                <option value="0">left</option>
+                <option value="1" selected>right</option>
+            </select>
         </form>
         <div class="canvas-container">
             <video id="video1" muted width="640" height="360" controls></video>

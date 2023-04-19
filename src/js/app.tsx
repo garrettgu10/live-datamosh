@@ -90,8 +90,8 @@ function main() {
     sources.push(new CameraFeed(src1Canvas));
     // @ts-ignore
     sources.push(new VideoPlayer(src2Canvas, require("url:../videos/bun33s.mp4") as string));
-    srcReconstructor = new MotionReconstructor(inCanvas, canvas, outCanvas);
-    destReconstructor = new MotionReconstructor(src2Canvas, canvas, destCanvas);
+    srcReconstructor = new MotionReconstructor(inCanvas, inCanvas, canvas, outCanvas);
+    destReconstructor = new MotionReconstructor(src1Canvas, src2Canvas, canvas, destCanvas);
 
     settingsManager = new SettingsManager(srcReconstructor, destReconstructor);
     settingsManager.mount();
@@ -101,12 +101,12 @@ function main() {
 
 window.onload = main;
 
-document.getElementById('target-btn')?.addEventListener('click', () => {
+document.getElementById('begin-btn')?.addEventListener('click', () => {
     // currTarget = (currTarget + 1) % targets.length;
     (sources[0] as VideoTarget).attachVideo(document.getElementById("video1") as HTMLVideoElement);
     (sources[1] as VideoTarget).attachVideo(document.getElementById("video2") as HTMLVideoElement);
 });
 
-document.getElementById("dbg-btn")?.addEventListener('click', () => {
-    draw();
+document.getElementById("iframe-btn")?.addEventListener('click', () => {
+    destReconstructor.iframeCountdown = 0;
 });

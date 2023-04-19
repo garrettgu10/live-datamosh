@@ -114,11 +114,12 @@ export const motionReconstructFragmentShader = (blockSize: number, mseThresh: nu
 precision highp float;
 
 uniform vec2 uResolution;
-uniform bool uUseGroundTruth;
+uniform bool uIsIframe;
 
 uniform sampler2D uPrevFrame; // the frame we should base reconstruction on
 uniform sampler2D uMotionEstimate; // the motion estimate from the previous frame
-uniform sampler2D uGroundTruth; // the ground truth frame, sample when mseThresh is hit
+uniform sampler2D uIblockSrc; // the ground truth frame, sample when mseThresh is hit
+uniform sampler2D uIframe; // the iframe, sample when uIsIframe is true
 
 varying vec2 frag_xy;
 
@@ -148,22 +149,22 @@ void main() {
     // gl_FragColor = texture2D(uMotionEstimate, me_uv);
 
     if (me.b > 0.9) {
-        gl_FragColor = texture2D(uGroundTruth, uv);
+        gl_FragColor = texture2D(uIblockSrc, uv);
         // gl_FragColor.a = 0.8;
         // gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
         // gl_FragColor.b = 1.0;
     }
     // gl_FragColor = me;
 
-    if(uUseGroundTruth) {
-        gl_FragColor = texture2D(uGroundTruth, uv);
+    if(uIsIframe) {
+        gl_FragColor = texture2D(uIframe, uv);
     }
 
     // if(uv.x > 0.5) {
     //     vec2 new_uv = vec2(uv.x - 0.5, uv.y);
     //     gl_FragColor = texture2D(uPrevFrame, new_uv);
     //     // if(gl_FragColor.b > 0.9){
-    //     //     gl_FragColor = texture2D(uGroundTruth, new_uv);
+    //     //     gl_FragColor = texture2D(uIblockSrc, new_uv);
     //     // }
     // }
 
