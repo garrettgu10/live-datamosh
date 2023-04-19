@@ -1,5 +1,5 @@
 import {motionEstimateVertexShader, motionEstimateFragmentShader, buildShaderProgram} from "./shaders";
-import {BLOCK_SIZE, MSE_THRESH} from "./consts";
+import {BLOCK_SIZE, IBLOCK_THRESH} from "./consts";
 
 export class MotionEstimator{
     private shaderProgram: WebGLProgram;
@@ -10,6 +10,9 @@ export class MotionEstimator{
     private xyArray: Float32Array;
     private xyBuffer: WebGLBuffer;
     public gl: WebGLRenderingContext;
+
+    private _iblockThresh: number = IBLOCK_THRESH;
+
     public constructor(
         public inCanvas: HTMLCanvasElement,
         public canvas: HTMLCanvasElement,
@@ -22,15 +25,10 @@ export class MotionEstimator{
             return;
         }
 
-        const shaderSet = [
-            {type: gl.VERTEX_SHADER, src: motionEstimateVertexShader},
-            {type: gl.FRAGMENT_SHADER, src: motionEstimateFragmentShader(BLOCK_SIZE, MSE_THRESH)}
-        ];
+        this.compileShader();
 
         canvas.width = inCanvas.width / BLOCK_SIZE;
         canvas.height = inCanvas.height / BLOCK_SIZE;
-    
-        this.shaderProgram = buildShaderProgram(gl, shaderSet);
 
         this.vertexArray = new Float32Array([
             -1, 1, 1, 1, 1, -1, -1, 1, 1, -1, -1, -1,
@@ -45,12 +43,31 @@ export class MotionEstimator{
         gl.clearColor(0, 0, 0, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
 
-        gl.useProgram(this.shaderProgram);
-
         this.vertexBuffer = gl.createBuffer() as WebGLBuffer;
         this.xyBuffer = gl.createBuffer() as WebGLBuffer;
         this.textures = [gl.createTexture() as WebGLTexture, gl.createTexture() as WebGLTexture];
         this.currentFrameTextureIdx = 0;
+    }
+
+    public set iblockThresh(value: number) {
+        this._iblockThresh = value;
+        this.compileShader();
+    }
+
+    public get iblockThresh(): number {
+        return this._iblockThresh;
+    }
+
+    public compileShader() {
+        const {gl} = this;
+        const shaderSet = [
+            {type: gl.VERTEX_SHADER, src: motionEstimateVertexShader},
+            {type: gl.FRAGMENT_SHADER, src: motionEstimateFragmentShader(BLOCK_SIZE, this.iblockThresh)}
+        ];
+        console.log(shaderSet[1].src);
+        this.shaderProgram = buildShaderProgram(gl, shaderSet);
+
+        gl.useProgram(this.shaderProgram);
     }
 
     private nextFrame() {

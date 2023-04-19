@@ -93,7 +93,7 @@ function main() {
     srcReconstructor = new MotionReconstructor(inCanvas, inCanvas, canvas, outCanvas);
     destReconstructor = new MotionReconstructor(src1Canvas, src2Canvas, canvas, destCanvas);
 
-    settingsManager = new SettingsManager(srcReconstructor, destReconstructor);
+    settingsManager = new SettingsManager(estimator, srcReconstructor, destReconstructor);
     settingsManager.mount();
 
     draw();

@@ -110,7 +110,7 @@ void main() {
     frag_xy = aXY;
 }`;
 
-export const motionReconstructFragmentShader = (blockSize: number, mseThresh: number) => `
+export const motionReconstructFragmentShader = (blockSize: number) => `
 precision highp float;
 
 uniform vec2 uResolution;

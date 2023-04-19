@@ -1,7 +1,9 @@
 import { MotionReconstructor } from "./motion-reconstructor";
+import { MotionEstimator } from "./motion-estimator";
 
 export class SettingsManager {
     constructor(
+        public motionEstimator: MotionEstimator,
         public srcReconstructor: MotionReconstructor,
         public destReconstructor: MotionReconstructor) {
 
@@ -17,7 +19,7 @@ export class SettingsManager {
         const iframeThresholdInput = document.getElementById("iframe-threshold") as HTMLInputElement;
         iframeThresholdInput.value = this.srcReconstructor.iframeThreshold.toString();
         iframeThresholdInput.addEventListener("change", (e) => {
-            this.setIframeThreshold(parseInt(iframeThresholdInput.value));
+            this.setIframeThreshold(parseFloat(iframeThresholdInput.value));
         });
 
         const iframeSourceInput = document.getElementById("iframe-source") as HTMLSelectElement;
@@ -30,6 +32,11 @@ export class SettingsManager {
             this.setIblockSrc(parseInt(iblockSourceInput.value));
         });
 
+        const iblockThresholdInput = document.getElementById("iblock-threshold") as HTMLInputElement;
+        iblockThresholdInput.value = this.motionEstimator.iblockThresh.toString();
+        iblockThresholdInput.addEventListener("change", (e) => {
+            this.setIblockThreshold(parseFloat(iblockThresholdInput.value));
+        });
     }
 
     setIframeSrc(idx: number) {
@@ -38,6 +45,14 @@ export class SettingsManager {
 
     setIblockSrc(idx: number) {
         this.destReconstructor.iblockSrcIdx = idx;
+    }
+
+    setIblockThreshold(threshold: number) {
+        console.log(threshold);
+        if(threshold <= 0 || threshold > 1) {
+            return;
+        }
+        this.motionEstimator.iblockThresh = threshold;
     }
 
     setIframeInterval(interval: number) {

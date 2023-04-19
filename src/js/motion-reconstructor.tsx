@@ -1,5 +1,5 @@
 import { motionReconstructFragmentShader, motionReconstructVertexShader, buildShaderProgram } from "./shaders";
-import { BLOCK_SIZE, MSE_THRESH, IFRAME_INTERVAL, IFRAME_THRESH } from "./consts";
+import { BLOCK_SIZE, IFRAME_INTERVAL, IFRAME_THRESH } from "./consts";
 
 export class MotionReconstructor {
     private shaderProgram: WebGLProgram;
@@ -32,7 +32,7 @@ export class MotionReconstructor {
 
         const shaderSet = [
             { type: gl.VERTEX_SHADER, src: motionReconstructVertexShader },
-            { type: gl.FRAGMENT_SHADER, src: motionReconstructFragmentShader(BLOCK_SIZE, MSE_THRESH) }
+            { type: gl.FRAGMENT_SHADER, src: motionReconstructFragmentShader(BLOCK_SIZE) }
         ];
 
         inCanvas1.width = inCanvas0.width;
