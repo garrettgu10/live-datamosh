@@ -5,5 +5,6 @@ export interface Target {
 }
 
 export interface VideoTarget extends Target {
+    video: HTMLVideoElement;
     attachVideo(video: HTMLVideoElement): void;
 }

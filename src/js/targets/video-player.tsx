@@ -10,6 +10,9 @@ export class VideoPlayer implements Target {
     }
 
     public attachVideo(video: HTMLVideoElement) {
+        if(video.children.length > 0)
+            video.removeChild(video.children[0]);
+        video.srcObject = null;
         this.video = video;
         video.appendChild(this.source);
         video.load();
