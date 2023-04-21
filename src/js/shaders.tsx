@@ -116,6 +116,11 @@ precision highp float;
 uniform vec2 uResolution;
 uniform bool uIsIframe;
 
+// distortion parameters
+uniform vec2 uDeltaMultiplier;
+uniform vec2 uSpinMultiplier;
+uniform vec2 uScaleMultiplier;
+
 uniform sampler2D uPrevFrame; // the frame we should base reconstruction on
 uniform sampler2D uMotionEstimate; // the motion estimate from the previous frame
 uniform sampler2D uIblockSrc; // the ground truth frame, sample when mseThresh is hit
@@ -125,6 +130,20 @@ varying vec2 frag_xy;
 
 float round(float x) {
     return floor(x + 0.5);
+}
+
+vec2 spin(vec2 xy) {
+    vec2 scaled_xy = (xy - uResolution / 2.0) / uResolution.y;
+    float x = scaled_xy.x;
+    float y = scaled_xy.y;
+    return vec2(-y, x) * uSpinMultiplier;
+}
+
+vec2 scale(vec2 xy) {
+    vec2 scaled_xy = (xy - uResolution / 2.0) / uResolution.y;
+    float x = scaled_xy.x;
+    float y = scaled_xy.y;
+    return vec2(x, y) * uScaleMultiplier;
 }
 
 void main() {
@@ -138,7 +157,9 @@ void main() {
 
     vec4 me = texture2D(uMotionEstimate, me_uv);
 
-    vec2 delta = vec2(me.r - 0.5, me.g - 0.5) * 15.0;
+    vec2 delta = vec2(me.r - 0.5, me.g - 0.5) * 15.0 * uDeltaMultiplier;
+    delta += spin(pos);
+    delta -= scale(pos);
     vec2 sample_xy = pos + vec2(round(delta.x), round(delta.y));
 
     gl_FragColor = vec4(1.0-abs(delta.x - round(delta.x)), 1.0-abs(delta.y - round(delta.y)), 0, 1);

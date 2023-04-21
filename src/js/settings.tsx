@@ -37,6 +37,42 @@ export class SettingsManager {
         iblockThresholdInput.addEventListener("change", (e) => {
             this.setIblockThreshold(parseFloat(iblockThresholdInput.value));
         });
+
+        const deltaMultXInput = document.getElementById("delta-mult-x") as HTMLInputElement;
+        deltaMultXInput.value = this.destReconstructor.deltaMultiplier[0].toString();
+        deltaMultXInput.addEventListener("change", (e) => {
+            this.destReconstructor.deltaMultiplier[0] = parseFloat(deltaMultXInput.value);
+        });
+
+        const deltaMultYInput = document.getElementById("delta-mult-y") as HTMLInputElement;
+        deltaMultYInput.value = this.destReconstructor.deltaMultiplier[1].toString();
+        deltaMultYInput.addEventListener("change", (e) => {
+            this.destReconstructor.deltaMultiplier[1] = parseFloat(deltaMultYInput.value);
+        });
+
+        const spinMultXInput = document.getElementById("spin-mult-x") as HTMLInputElement;
+        spinMultXInput.value = this.destReconstructor.spinMultiplier[0].toString();
+        spinMultXInput.addEventListener("change", (e) => {
+            this.destReconstructor.spinMultiplier[0] = parseFloat(spinMultXInput.value);
+        });
+
+        const spinMultYInput = document.getElementById("spin-mult-y") as HTMLInputElement;
+        spinMultYInput.value = this.destReconstructor.spinMultiplier[1].toString();
+        spinMultYInput.addEventListener("change", (e) => {
+            this.destReconstructor.spinMultiplier[1] = parseFloat(spinMultYInput.value);
+        });
+
+        const scaleMultXInput = document.getElementById("scale-mult-x") as HTMLInputElement;
+        scaleMultXInput.value = this.destReconstructor.scaleMultiplier[0].toString();
+        scaleMultXInput.addEventListener("change", (e) => {
+            this.destReconstructor.scaleMultiplier[0] = parseFloat(scaleMultXInput.value);
+        });
+
+        const scaleMultYInput = document.getElementById("scale-mult-y") as HTMLInputElement;
+        scaleMultYInput.value = this.destReconstructor.scaleMultiplier[1].toString();
+        scaleMultYInput.addEventListener("change", (e) => {
+            this.destReconstructor.scaleMultiplier[1] = parseFloat(scaleMultYInput.value);
+        });
     }
 
     setIframeSrc(idx: number) {

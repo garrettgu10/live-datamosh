@@ -17,6 +17,10 @@ export class MotionReconstructor {
     public iblockSrcIdx: number = 1;
     public iframeSrcIdx: number = 1;
 
+    public deltaMultiplier: number[] = [1, 1];
+    public spinMultiplier: number[] = [0, 0];
+    public scaleMultiplier: number[] = [0, 0];
+
     public constructor(
         public inCanvas0: HTMLCanvasElement,
         public inCanvas1: HTMLCanvasElement,
@@ -106,6 +110,15 @@ export class MotionReconstructor {
         const uIsIframe = gl.getUniformLocation(this.shaderProgram, "uIsIframe");
         gl.uniform1i(uIsIframe, this.iframeCountdown <= 0 ? 1 : 0);
 
+        const uDeltaMultiplier = gl.getUniformLocation(this.shaderProgram, "uDeltaMultiplier");
+        gl.uniform2f(uDeltaMultiplier, this.deltaMultiplier[0], this.deltaMultiplier[1]);
+
+        const uSpinMultiplier = gl.getUniformLocation(this.shaderProgram, "uSpinMultiplier");
+        gl.uniform2f(uSpinMultiplier, this.spinMultiplier[0], this.spinMultiplier[1]);
+
+        const uScaleMultiplier = gl.getUniformLocation(this.shaderProgram, "uScaleMultiplier");
+        gl.uniform2f(uScaleMultiplier, this.scaleMultiplier[0], this.scaleMultiplier[1]);
+
         gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
 
         this.assignTexture("uPrevFrame", canvas, 0);
@@ -132,7 +145,7 @@ export class MotionReconstructor {
         gl.enableVertexAttribArray(aXY);
         gl.vertexAttribPointer(
             aXY,
-            2,  
+            2,
             gl.FLOAT,
             false,
             0,
