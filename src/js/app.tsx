@@ -76,6 +76,23 @@ function dbg() {
 
 }
 
+function addDropListener(container: HTMLDivElement, sourceIdx: number) {
+    container.addEventListener("dragover", (e) => {
+        e.preventDefault();
+    });
+
+    container.addEventListener("drop", (e) => {
+        e.preventDefault();
+        const file = e.dataTransfer?.files[0];
+        if(file == null) return;
+        const src = URL.createObjectURL(file);
+        const video = new VideoPlayer(sources[sourceIdx].canvas, src);
+        console.log(sources[sourceIdx]);
+        video.attachVideo(container.children[0] as HTMLVideoElement);
+        sources[sourceIdx] = video;
+    });
+}
+
 function main() {
     const inCanvas = document.getElementById("incanvas") as HTMLCanvasElement;
     const canvas = document.getElementById("glcanvas") as HTMLCanvasElement;
@@ -95,6 +112,12 @@ function main() {
 
     settingsManager = new SettingsManager(estimator, srcReconstructor, destReconstructor);
     settingsManager.mount();
+
+    const video1Container = document.getElementById("video1-container") as HTMLDivElement;
+    const video2Container = document.getElementById("video2-container") as HTMLDivElement;
+
+    addDropListener(video1Container, 0);
+    addDropListener(video2Container, 1);
 
     draw();
 }

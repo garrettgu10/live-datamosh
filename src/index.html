@@ -59,8 +59,12 @@
         </form>
         <br>
         <div class="canvas-container">
-            <video id="video1" muted width="640" height="360" controls></video>
-            <video id="video2" muted width="640" height="360" controls></video>
+            <div id="video1-container">
+                <video id="video1" muted width="640" height="360" controls></video>
+            </div>
+            <div id="video2-container">
+                <video id="video2" muted width="640" height="360" controls></video>
+            </div>
             <canvas id="src1canvas" width="1280" height="720" style="width: 640px; display: none"></canvas>
             <canvas id="src2canvas" width="1280" height="720" style="width: 640px; display: none"></canvas>
             <canvas id="destcanvas" width="1280" height="720" style="width: 1280px"></canvas>
