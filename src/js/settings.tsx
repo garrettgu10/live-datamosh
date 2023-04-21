@@ -50,6 +50,18 @@ export class SettingsManager {
             this.destReconstructor.deltaMultiplier[1] = parseFloat(deltaMultYInput.value);
         });
 
+        const deltaOffsetXInput = document.getElementById("delta-offset-x") as HTMLInputElement;
+        deltaOffsetXInput.value = this.destReconstructor.deltaOffset[0].toString();
+        deltaOffsetXInput.addEventListener("change", (e) => {
+            this.destReconstructor.deltaOffset[0] = parseFloat(deltaOffsetXInput.value);
+        });
+
+        const deltaOffsetYInput = document.getElementById("delta-offset-y") as HTMLInputElement;
+        deltaOffsetYInput.value = this.destReconstructor.deltaOffset[1].toString();
+        deltaOffsetYInput.addEventListener("change", (e) => {
+            this.destReconstructor.deltaOffset[1] = parseFloat(deltaOffsetYInput.value);
+        });
+
         const spinMultXInput = document.getElementById("spin-mult-x") as HTMLInputElement;
         spinMultXInput.value = this.destReconstructor.spinMultiplier[0].toString();
         spinMultXInput.addEventListener("change", (e) => {

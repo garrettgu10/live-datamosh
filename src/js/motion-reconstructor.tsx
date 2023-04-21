@@ -18,6 +18,7 @@ export class MotionReconstructor {
     public iframeSrcIdx: number = 1;
 
     public deltaMultiplier: number[] = [1, 1];
+    public deltaOffset: number[] = [0, 0];
     public spinMultiplier: number[] = [0, 0];
     public scaleMultiplier: number[] = [0, 0];
 
@@ -112,6 +113,9 @@ export class MotionReconstructor {
 
         const uDeltaMultiplier = gl.getUniformLocation(this.shaderProgram, "uDeltaMultiplier");
         gl.uniform2f(uDeltaMultiplier, this.deltaMultiplier[0], this.deltaMultiplier[1]);
+
+        const uDeltaOffset = gl.getUniformLocation(this.shaderProgram, "uDeltaOffset");
+        gl.uniform2f(uDeltaOffset, this.deltaOffset[0], this.deltaOffset[1]);
 
         const uSpinMultiplier = gl.getUniformLocation(this.shaderProgram, "uSpinMultiplier");
         gl.uniform2f(uSpinMultiplier, this.spinMultiplier[0], this.spinMultiplier[1]);
