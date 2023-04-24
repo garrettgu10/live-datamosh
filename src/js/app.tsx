@@ -86,9 +86,12 @@ function addDropListener(container: HTMLDivElement, sourceIdx: number) {
         const file = e.dataTransfer?.files[0];
         if(file == null) return;
         const src = URL.createObjectURL(file);
+        const prevVideo = sources[sourceIdx] as VideoTarget;
         const video = new VideoPlayer(sources[sourceIdx].canvas, src);
-        console.log(sources[sourceIdx]);
         video.attachVideo(container.children[0] as HTMLVideoElement);
+        if(prevVideo.video != null) {
+            video.video.playbackRate = prevVideo.video.playbackRate;
+        }
         sources[sourceIdx] = video;
     });
 }
@@ -110,7 +113,7 @@ function main() {
     srcReconstructor = new MotionReconstructor(inCanvas, inCanvas, canvas, outCanvas);
     destReconstructor = new MotionReconstructor(src1Canvas, src2Canvas, canvas, destCanvas);
 
-    settingsManager = new SettingsManager(estimator, srcReconstructor, destReconstructor);
+    settingsManager = new SettingsManager(sources, estimator, srcReconstructor, destReconstructor);
     settingsManager.mount();
 
     const video1Container = document.getElementById("video1-container") as HTMLDivElement;

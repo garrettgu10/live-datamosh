@@ -1,8 +1,10 @@
 import { MotionReconstructor } from "./motion-reconstructor";
 import { MotionEstimator } from "./motion-estimator";
+import { Target, VideoTarget } from "./targets/target";
 
 export class SettingsManager {
     constructor(
+        public sources: Target[],
         public motionEstimator: MotionEstimator,
         public srcReconstructor: MotionReconstructor,
         public destReconstructor: MotionReconstructor) {
@@ -85,6 +87,23 @@ export class SettingsManager {
         scaleMultYInput.addEventListener("change", (e) => {
             this.destReconstructor.scaleMultiplier[1] = parseFloat(scaleMultYInput.value);
         });
+
+        const vidRateLeftInput = document.getElementById("vid-rate-left") as HTMLInputElement;
+        vidRateLeftInput.addEventListener("change", (e) => {
+            const source = this.sources[0] as VideoTarget;
+            if (source) {
+                source.video.playbackRate = parseFloat(vidRateLeftInput.value);
+            }
+        });
+
+        const vidRateRightInput = document.getElementById("vid-rate-right") as HTMLInputElement;
+        vidRateRightInput.addEventListener("change", (e) => {
+            const source = this.sources[1] as VideoTarget;
+            if (source) {
+                source.video.playbackRate = parseFloat(vidRateRightInput.value);
+            }
+        });
+
     }
 
     setIframeSrc(idx: number) {
