@@ -70,27 +70,6 @@ export class MotionEstimator{
         gl.useProgram(this.shaderProgram);
     }
 
-    private nextFrame() {
-        const {gl, inCanvas} = this;
-
-        const textures = [gl.TEXTURE0, gl.TEXTURE1];
-        const nextTextureIdx = 1 - this.currentFrameTextureIdx;
-        gl.activeTexture(textures[nextTextureIdx]);
-        gl.bindTexture(gl.TEXTURE_2D, this.textures[nextTextureIdx]);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, inCanvas);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
-        this.currentFrameTextureIdx = nextTextureIdx;
-
-        const uCurrFrame = gl.getUniformLocation(this.shaderProgram, "uCurrFrame");
-        gl.uniform1i(uCurrFrame, this.currentFrameTextureIdx);
-        const uPrevFrame = gl.getUniformLocation(this.shaderProgram, "uPrevFrame");
-        gl.uniform1i(uPrevFrame, 1 - this.currentFrameTextureIdx);
-    }
-
     private assignTexture(name: string, canvas: HTMLCanvasElement, idx: number) {
         const { gl } = this;
         const textures = [gl.TEXTURE0, gl.TEXTURE1, gl.TEXTURE2];

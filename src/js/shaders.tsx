@@ -118,6 +118,7 @@ uniform bool uIsIframe;
 
 // distortion parameters
 uniform vec2 uDeltaMultiplier;
+uniform vec2 uDeltaOffset;
 uniform vec2 uSpinMultiplier;
 uniform vec2 uScaleMultiplier;
 
@@ -157,7 +158,7 @@ void main() {
 
     vec4 me = texture2D(uMotionEstimate, me_uv);
 
-    vec2 delta = vec2(me.r - 0.5, me.g - 0.5) * 15.0 * uDeltaMultiplier;
+    vec2 delta = vec2(me.r - 0.5, me.g - 0.5) * 15.0 * uDeltaMultiplier + uDeltaOffset;
     delta += spin(pos);
     delta -= scale(pos);
     vec2 sample_xy = pos + vec2(round(delta.x), round(delta.y)) + vec2(0.5, 0.5);

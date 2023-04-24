@@ -48,6 +48,10 @@
             <input type="number" id="delta-mult-x" name="delta-mult-x" value="1">
             <label for="delta-mult-y">delta mult y:</label>
             <input type="number" id="delta-mult-y" name="delta-mult-y" value="1"><br><br>
+            <label for="delta-offset-x">delta offset x:</label>
+            <input type="number" id="delta-offset-x" name="delta-offset-x" value="0">
+            <label for="delta-offset-y">delta offset y:</label>
+            <input type="number" id="delta-offset-y" name="delta-offset-y" value="0"><br><br>
             <label for="spin-mult-x">spin mult x:</label>
             <input type="number" id="spin-mult-x" name="spin-mult-x" value="1">
             <label for="spin-mult-y">spin mult y:</label>
@@ -58,16 +62,16 @@
             <input type="number" id="scale-mult-y" name="scale-mult-y" value="1"><br><br>
         </form>
         <br>
+        <canvas id="destcanvas" width="1280" height="720" style="width: 1280px"></canvas>
         <div class="canvas-container">
             <div id="video1-container">
                 <video id="video1" muted width="640" height="360" controls></video>
+                <canvas id="src1canvas" width="1280" height="720" style="width: 640px; display: none"></canvas>
             </div>
             <div id="video2-container">
                 <video id="video2" muted width="640" height="360" controls></video>
+                <canvas id="src2canvas" width="1280" height="720" style="width: 640px; display: none"></canvas>
             </div>
-            <canvas id="src1canvas" width="1280" height="720" style="width: 640px; display: none"></canvas>
-            <canvas id="src2canvas" width="1280" height="720" style="width: 640px; display: none"></canvas>
-            <canvas id="destcanvas" width="1280" height="720" style="width: 1280px"></canvas>
         </div>
 
         <div class="canvas-container">
