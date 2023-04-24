@@ -160,9 +160,9 @@ void main() {
     vec2 delta = vec2(me.r - 0.5, me.g - 0.5) * 15.0 * uDeltaMultiplier;
     delta += spin(pos);
     delta -= scale(pos);
-    vec2 sample_xy = pos + vec2(round(delta.x), round(delta.y));
+    vec2 sample_xy = pos + vec2(round(delta.x), round(delta.y)) + vec2(0.5, 0.5);
 
-    gl_FragColor = vec4(1.0-abs(delta.x - round(delta.x)), 1.0-abs(delta.y - round(delta.y)), 0, 1);
+    // gl_FragColor = vec4(1.0-abs(delta.x - round(delta.x)), 1.0-abs(delta.y - round(delta.y)), 0, 1);
 
     vec2 sample_uv = sample_xy / uResolution;
 
