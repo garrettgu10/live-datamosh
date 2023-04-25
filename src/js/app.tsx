@@ -15,6 +15,11 @@ const pFrameSrcIdx: number = 0;
 let srcReconstructor: MotionReconstructor;
 let destReconstructor: MotionReconstructor;
 let settingsManager: SettingsManager;
+let stream: MediaStream;
+let options: MediaRecorderOptions;
+let recorder: MediaRecorder;
+let recordedBlobs: Blob[];
+let video: HTMLVideoElement;
 function draw() {
     for(let source of sources) {
         source.draw();
@@ -105,6 +110,10 @@ function main() {
     const src2Canvas = document.getElementById("src2canvas") as HTMLCanvasElement;
     const destCanvas = document.getElementById("destcanvas") as HTMLCanvasElement;
 
+    stream = destCanvas.captureStream(FRAME_RATE);
+    options = {mimeType: 'video/webm'};
+    video = document.getElementById("videof") as HTMLVideoElement;
+
     estimator = new MotionEstimator(inCanvas, canvas, outCanvas);
     // sources.push(new HelloWorld(src1Canvas));
     sources.push(new CameraFeed(src1Canvas));
@@ -135,4 +144,23 @@ document.getElementById('begin-btn')?.addEventListener('click', () => {
 
 document.getElementById("iframe-btn")?.addEventListener('click', () => {
     destReconstructor.iframeCountdown = 0;
+});
+
+document.getElementById('start-recording-btn')?.addEventListener('click', () => {
+    recorder = new MediaRecorder(stream, options);
+    recordedBlobs = [];
+    recorder.ondataavailable = (event) => {
+        if (event.data && event.data.size > 0) {
+            recordedBlobs.push(event.data);
+        }
+    };
+    recorder.onstop = (e) => {
+        const superBuffer = new Blob(recordedBlobs, {type: 'video/webm'});
+        video.src = window.URL.createObjectURL(superBuffer);
+    }
+    recorder.start(100);
+});
+
+document.getElementById('stop-recording-btn')?.addEventListener('click', () => {
+    recorder.stop();
 });
