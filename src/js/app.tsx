@@ -162,8 +162,13 @@ document.getElementById('start-recording-btn')?.addEventListener('click', () => 
         video.src = window.URL.createObjectURL(superBuffer);
     }
     recorder.start(100);
+    (document.getElementById('start-recording-btn') as HTMLButtonElement).disabled = true;
+    (document.getElementById('stop-recording-btn') as HTMLButtonElement).disabled = false;
 });
 
 document.getElementById('stop-recording-btn')?.addEventListener('click', () => {
     recorder.stop();
+    (document.getElementById('start-recording-btn') as HTMLButtonElement).disabled = false;
+    (document.getElementById('stop-recording-btn') as HTMLButtonElement).disabled = true;
+    (document.getElementById('record-text') as HTMLAnchorElement).hidden = false;
 });
