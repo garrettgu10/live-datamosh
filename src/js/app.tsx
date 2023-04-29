@@ -117,8 +117,8 @@ function main() {
 
     estimator = new MotionEstimator(inCanvas, canvas, outCanvas);
     // @ts-ignore
-    sources.push(new LiveVisualization(src1Canvas, require("url:../videos/Partways_-_Kemuri.wav") as string));
-    // sources.push(new CameraFeed(src1Canvas));
+    // sources.push(new LiveVisualization(src1Canvas, require("url:../videos/Partways_-_Kemuri.wav") as string));
+    sources.push(new CameraFeed(src1Canvas));
     // @ts-ignore
     sources.push(new VideoPlayer(src2Canvas, require("url:../videos/bun33s.mp4") as string));
     srcReconstructor = new MotionReconstructor(inCanvas, inCanvas, canvas, outCanvas);
@@ -140,8 +140,8 @@ window.onload = main;
 
 document.getElementById('begin-btn')?.addEventListener('click', () => {
     // currTarget = (currTarget + 1) % targets.length;
-    // (sources[0] as VideoTarget).attachVideo(document.getElementById("video1") as HTMLVideoElement);
-    (sources[0] as AudioTarget).attachAudio(document.getElementById("audio1") as HTMLAudioElement);
+    (sources[0] as VideoTarget).attachVideo(document.getElementById("video1") as HTMLVideoElement);
+    // (sources[0] as AudioTarget).attachAudio(document.getElementById("audio1") as HTMLAudioElement);
     (sources[1] as VideoTarget).attachVideo(document.getElementById("video2") as HTMLVideoElement);
 });
 
@@ -162,8 +162,65 @@ document.getElementById('start-recording-btn')?.addEventListener('click', () => 
         video.src = window.URL.createObjectURL(superBuffer);
     }
     recorder.start(100);
+    (document.getElementById('start-recording-btn') as HTMLButtonElement).disabled = true;
+    (document.getElementById('stop-recording-btn') as HTMLButtonElement).disabled = false;
 });
 
 document.getElementById('stop-recording-btn')?.addEventListener('click', () => {
     recorder.stop();
+    (document.getElementById('start-recording-btn') as HTMLButtonElement).disabled = false;
+    (document.getElementById('stop-recording-btn') as HTMLButtonElement).disabled = true;
+    (document.getElementById('record-text') as HTMLAnchorElement).hidden = false;
+});
+
+document.getElementById('video1-source')?.addEventListener('change', (event) => {
+    if (!event.target) return;
+    const value = (event.target as HTMLSelectElement).value;
+    if (value === "0") {
+        (document.getElementById('video2-web') as HTMLOptionElement).disabled = true;
+        (document.getElementById('video1-file') as HTMLInputElement).disabled = true;
+        sources[0] = new CameraFeed(document.getElementById("src1canvas") as HTMLCanvasElement);
+    }
+    else if (value === "1") {
+        (document.getElementById('video2-web') as HTMLOptionElement).disabled = false;
+        (document.getElementById('video1-file') as HTMLInputElement).disabled = false;
+        let e: any = document.getElementById('video1-file')
+        // @ts-ignore
+        sources[0] = new VideoPlayer(document.getElementById("src1canvas") as HTMLCanvasElement, require(e.value) as string);
+        (sources[0] as VideoTarget).attachVideo(document.getElementById("video1") as HTMLVideoElement);
+    }
+    else if (value === "2") {
+        (document.getElementById('video2-web') as HTMLOptionElement).disabled = false;
+        (document.getElementById('video1-file') as HTMLInputElement).disabled = false;
+        let e: any = document.getElementById('video1-file')
+        // @ts-ignore
+        sources[0] = new LiveVisualization(document.getElementById("src1canvas") as HTMLCanvasElement, require(e.value) as string);
+        (sources[0] as AudioTarget).attachAudio(document.getElementById("audio1") as HTMLAudioElement);
+    }
+});
+
+document.getElementById('video2-source')?.addEventListener('change', (event) => {
+    if (!event.target) return;
+    const value = (event.target as HTMLSelectElement).value;
+    if (value === "0") {
+        (document.getElementById('video1-web') as HTMLOptionElement).disabled = true;
+        (document.getElementById('video2-file') as HTMLInputElement).disabled = true;
+        sources[0] = new CameraFeed(document.getElementById("src2canvas") as HTMLCanvasElement);
+    }
+    else if (value === "1") {
+        (document.getElementById('video1-web') as HTMLOptionElement).disabled = false;
+        (document.getElementById('video2-file') as HTMLInputElement).disabled = false;
+        let e: any = document.getElementById('video2-file')
+        // @ts-ignore
+        sources[0] = new VideoPlayer(document.getElementById("src2canvas") as HTMLCanvasElement, require(e.value) as string);
+        (sources[0] as VideoTarget).attachVideo(document.getElementById("video2") as HTMLVideoElement);
+    }
+    else if (value === "2") {
+        (document.getElementById('video1-web') as HTMLOptionElement).disabled = false;
+        (document.getElementById('video2-file') as HTMLInputElement).disabled = false;
+        let e: any = document.getElementById('video2-file')
+        // @ts-ignore
+        sources[0] = new LiveVisualization(document.getElementById("src2canvas") as HTMLCanvasElement, require(e.value) as string);
+        (sources[0] as AudioTarget).attachAudio(document.getElementById("audio2") as HTMLAudioElement);
+    }
 });

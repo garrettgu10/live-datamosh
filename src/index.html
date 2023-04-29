@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>My First Web Page</title>
+        <title>Live Datamoshing</title>
         <style>
             .stacked {
                 position: relative;
@@ -23,17 +23,16 @@
         </style>
     </head>
     <body>
-        <h1>My First Web Page</h1>
-        <p>My first paragraph.</p>
+        <h1>Live Datamoshing</h1>
         <button id="begin-btn">begin</button><button id="iframe-btn">force iframe</button><br><br>
-        <button id="start-recording-btn">start recording</button><button id="stop-recording-btn">stop recording</button><br><br>
+        <button id="start-recording-btn">start recording</button><button id="stop-recording-btn" disabled>stop recording</button><a href="#recorded-container" id="record-text" hidden hidden>Recorded Video</a><br><br>
         <form>
             <label for="iframe-interval">iframe interval:</label>
-            <input type="number" id="iframe-interval" name="iframe-interval" value="1000"><br><br>
+            <input type="number" id="iframe-interval" name="iframe-interval" value="1000">
             <label for="iframe-threshold">iframe threshold:</label>
             <input type="number" id="iframe-threshold" name="iframe-threshold" value="0.1"><br><br>
             <label for="iblock-threshold">iblock threshold:</label>
-            <input type="number" id="iblock-threshold" name="iblock-threshold" value="0.1"><br><br>
+            <input type="number" id="iblock-threshold" name="iblock-threshold" value="0.1">
             <label for="iframe-source">iframe source:</label>
             <select id="iframe-source" name="iframe-source">
                 <option value="0">left</option>
@@ -65,21 +64,38 @@
             <input type="number" id="vid-rate-left" name="vid-rate-left" value="1">
             <label for="vid-rate-right">video rate (right):</label>
             <input type="number" id="vid-rate-right" name="vid-rate-right" value="1"><br><br>
+            <label for="video1-source">input 1 source:</label>
+            <select id="video1-source" name="video1-source">
+                <option id="video1-web" value="0" selected>webcam</option>
+                <option value="1">video</option>
+                <option value="2">audio visualizer</option>
+            </select>
+            <input type="text" id="video1-file" name="video1-file" disabled></input><br><br>
+            <label for="video1-source">input 2 source:</label>
+            <select id="video2-source" name="video2-source">
+                <option id="video2-web" value="0" disabled>webcam</option>
+                <option value="1" selected>video</option>
+                <option value="2">audio visualizer</option>
+            </select>
+            <input type="text" id="video2-file" name="video2-file"></input><br><br>
         </form>
         <br>
+        <h1>Output</h1>
         <canvas id="destcanvas" width="1280" height="720" style="width: 1280px"></canvas>
+        <h2>Source Videos</h2>
         <div class="canvas-container">
             <div id="video1-container">
                 <video id="video1" muted width="640" height="360" controls style="display: none"></video>
-                <audio id="audio1" muted controls></audio>
+                <audio id="audio1" muted controls style="display: none"></audio>
                 <canvas id="src1canvas" width="1280" height="720" style="width: 640px"></canvas>
             </div>
             <div id="video2-container">
                 <video id="video2" muted width="640" height="360" controls></video>
+                <audio id="audio2" muted controls style="display: none"></audio>
                 <canvas id="src2canvas" width="1280" height="720" style="width: 640px; display: none"></canvas>
             </div>
         </div>
-
+        <h2>Debug</h2>
         <div class="canvas-container">
             <canvas id="incanvas" width="1280" height="720" style="width: 640px"></canvas>
             <canvas id="glcanvas" style="width: 640px; image-rendering: pixelated;"></canvas>
@@ -90,6 +106,7 @@
                 <canvas id="dbgcanvas2" style="width: 640px"></canvas>
             </div>
         </div>
+        <h2>Recorded Video</h2>
         <div class="canvas-container-record">
             <div id="recorded-container">
                 <video id="videof" muted width="640" height="360" controls></video>
