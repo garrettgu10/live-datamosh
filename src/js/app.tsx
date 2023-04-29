@@ -117,8 +117,8 @@ function main() {
 
     estimator = new MotionEstimator(inCanvas, canvas, outCanvas);
     // @ts-ignore
-    sources.push(new LiveVisualization(src1Canvas, require("url:../videos/Partways_-_Kemuri.wav") as string));
-    // sources.push(new CameraFeed(src1Canvas));
+    // sources.push(new LiveVisualization(src1Canvas, require("url:../videos/Partways_-_Kemuri.wav") as string));
+    sources.push(new CameraFeed(src1Canvas));
     // @ts-ignore
     sources.push(new VideoPlayer(src2Canvas, require("url:../videos/bun33s.mp4") as string));
     srcReconstructor = new MotionReconstructor(inCanvas, inCanvas, canvas, outCanvas);
@@ -140,8 +140,8 @@ window.onload = main;
 
 document.getElementById('begin-btn')?.addEventListener('click', () => {
     // currTarget = (currTarget + 1) % targets.length;
-    // (sources[0] as VideoTarget).attachVideo(document.getElementById("video1") as HTMLVideoElement);
-    (sources[0] as AudioTarget).attachAudio(document.getElementById("audio1") as HTMLAudioElement);
+    (sources[0] as VideoTarget).attachVideo(document.getElementById("video1") as HTMLVideoElement);
+    // (sources[0] as AudioTarget).attachAudio(document.getElementById("audio1") as HTMLAudioElement);
     (sources[1] as VideoTarget).attachVideo(document.getElementById("video2") as HTMLVideoElement);
 });
 
