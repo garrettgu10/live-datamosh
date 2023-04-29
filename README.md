@@ -1,6 +1,6 @@
 # Live Datamoshing
 
-[Report](https://docs.google.com/document/d/1cUjG4-hqEbCv0srEhQfbqLt4jEGq_I3mA1XxIJpmQ4c/edit)
+[Report](https://docs.google.com/document/d/1cUjG4-hqEbCv0srEhQfbqLt4jEGq_I3mA1XxIJpmQ4c/edit) Also available as PDF in this repository.
 
 [Video Artifact](https://www.youtube.com/watch?v=Abdq_CCXnCs)
 
